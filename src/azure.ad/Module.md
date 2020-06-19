@@ -1,4 +1,4 @@
-Prints "Hello World!" with a main function.
+Client Connector for Azure Active Directory
 [//]: # (above is the module summary)
 
 # Module Overview

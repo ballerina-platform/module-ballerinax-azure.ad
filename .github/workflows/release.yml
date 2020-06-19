@@ -15,7 +15,7 @@ jobs:
         uses: ballerina-platform/ballerina-action/@master
         with:
           args:
-            build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
+            build -c azure.ad --skip-tests --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
       - name: Ballerina Push
         uses: ballerina-platform/ballerina-action/@master
         with:
