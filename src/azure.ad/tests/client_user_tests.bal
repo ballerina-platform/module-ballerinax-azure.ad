@@ -22,7 +22,10 @@ User? testUser2 = ();
 
 @test:BeforeSuite
 function createUserTest() {
-    record { string jobTitle; } additionalUser1Attributes = { jobTitle: "DevOps Engineer" };
+    record { string jobTitle; string postalCode; } additionalUser1Attributes = { 
+        jobTitle: "DevOps Engineer",
+        postalCode: "10100"
+    };
 
     NewUser newUser1 = {
         accountEnabled: true,
@@ -114,29 +117,32 @@ function getUsersTest() {
 
 @test:Config {}
 function getUserTest() {
-    User adUser = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com");
+    User adUser = checkpanic adClient->getUser("garfieldlynns@" + TENANT_DOMAIN);
     test:assertEquals(adUser.displayName, "Garfield Lynns");
+
+    adUser = checkpanic adClient->getUser("garfieldlynns@" + TENANT_DOMAIN, additionalFields = ["postalCode"]);
+    test:assertEquals(adUser["postalCode"], "10100");
 }
 
 @test:Config {
     dependsOn: ["getUsersTest", "getUserTest"]
 }
 function updateUserTest() {
-    User user = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com");
+    User user = checkpanic adClient->getUser("garfieldlynns@" + TENANT_DOMAIN);
     user.jobTitle = "Senior DevOps Engineer";
     checkpanic adClient->updateUser(<@untainted>user);
 
-    user = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com");
+    user = checkpanic adClient->getUser("garfieldlynns@" + TENANT_DOMAIN);
     test:assertEquals(user?.jobTitle, "Senior DevOps Engineer");
 }
 
 @test:Config {}
 function assignManagerToUser() {
-    User user = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com");
-    User manager = checkpanic adClient->getUser("sandrawoosan@hemikak.onmicrosoft.com");
+    User user = checkpanic adClient->getUser("garfieldlynns@" + TENANT_DOMAIN);
+    User manager = checkpanic adClient->getUser("sandrawoosan@" + TENANT_DOMAIN);
     checkpanic adClient->assignManagerToUser(<@untainted>user, <@untainted>manager);
     User retrievedManager = checkpanic adClient->getManagerOfUser(<@untainted>user);
-    test:assertEquals(retrievedManager.userPrincipalName, "sandrawoosan@hemikak.onmicrosoft.com");
+    test:assertEquals(retrievedManager.userPrincipalName, "sandrawoosan@" + TENANT_DOMAIN);
 }
 
 @test:Config {}
