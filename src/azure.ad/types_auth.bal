@@ -55,7 +55,7 @@ public type PasswordGrantConfig record {|
     string username;
     string password;
     string clientId;
-    string clientSecret;
+    string clientSecret?;
     string[] scopes = ["https://graph.microsoft.com/.default"];
     RefreshConfig refreshConfig?;
     int clockSkewInSeconds = 0;

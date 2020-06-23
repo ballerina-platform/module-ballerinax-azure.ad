@@ -102,7 +102,7 @@ function groupMemberTest() {
 }
 
 @test:Config {}
-function addGroupOwnerTest() {
+function groupOwnerTest() {
     User? user2 = testUser2;
     Group? group1 = testGroup1;
     if (group1 is Group && user2 is User) {

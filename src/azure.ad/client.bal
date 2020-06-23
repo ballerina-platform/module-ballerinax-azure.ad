@@ -16,7 +16,7 @@
 
 import ballerina/http;
 
-const AD_GRAPH_API_URL = "https://graph.microsoft.com/v1.0";
+public const AD_GRAPH_API_URL = "https://graph.microsoft.com/v1.0";
 
 # The Client endpoint configuration for Azure Active Directory.
 #

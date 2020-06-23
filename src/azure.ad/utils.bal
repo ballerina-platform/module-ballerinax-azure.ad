@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-public function parseError(json errorJsonPayload) returns GraphAPIError|InvalidErrorPayload {
+function parseError(json errorJsonPayload) returns GraphAPIError|InvalidErrorPayload {
     json|error errorJsonOrError = errorJsonPayload.'error;
 
     if (errorJsonOrError is error) {

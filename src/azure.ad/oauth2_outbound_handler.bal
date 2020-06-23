@@ -46,13 +46,17 @@ public function getAzureADOutboundOAuth2BearerHandler(ClientCredentialsGrantConf
             username: oAuth2Config.username,
             password: oAuth2Config.password,
             clientId: oAuth2Config.clientId,
-            clientSecret: oAuth2Config.clientSecret,
             scopes: oAuth2Config.scopes,
             clockSkewInSeconds: oAuth2Config.clockSkewInSeconds,
             retryRequest: oAuth2Config.retryRequest,
             credentialBearer: oAuth2Config.credentialBearer,
             clientConfig: oAuth2Config.clientConfig
         };
+
+        string? clientSecret = oAuth2Config?.clientSecret;
+        if (clientSecret is string) {
+            passwordConfig.clientSecret = clientSecret;
+        }
 
         RefreshConfig? refreshConfig = oAuth2Config?.refreshConfig;
         if (refreshConfig is RefreshConfig) {
