@@ -108,13 +108,13 @@ function groupOwnerTest() {
     if (group1 is Group && user2 is User) {
         checkpanic adClient->addOwnerToGroup(group1, <@untainted>user2);
 
-        User[] members = checkpanic adClient->getGroupOwners(group1);
-        test:assertEquals(members.length(), 1);
-        test:assertEquals(members[0].displayName, "Sandra Woosan");
+        User[] owners = checkpanic adClient->getGroupOwners(group1);
+        test:assertEquals(owners.length(), 1);
+        test:assertEquals(owners[0].displayName, "Sandra Woosan");
 
         checkpanic adClient->removeOwnerFromGroup(group1, <@untainted>user2);
-        members = checkpanic adClient->getGroupOwners(group1);
-        test:assertEquals(members.length(), 0);
+        owners = checkpanic adClient->getGroupOwners(group1);
+        test:assertEquals(owners.length(), 0);
     } else {
         test:assertFail("group1 and user2 was not created");
     }
