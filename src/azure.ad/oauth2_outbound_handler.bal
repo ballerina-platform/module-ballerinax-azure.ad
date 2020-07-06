@@ -19,46 +19,47 @@ import ballerina/oauth2;
 
 # Creates an outbound auth handler which can be used by an http client.
 # 
-# + oAuth2Config - OAuth2 configuration for the client.
+# + oauth2Config - OAuth2 configuration for the client.
 # + return - Outbound auth handler.
-public function getAzureADOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oAuth2Config) returns http:BearerAuthHandler {
+public function getAzureAdOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
     oauth2:OutboundOAuth2Provider oAuthProvider;
-    if (oAuth2Config is ClientCredentialsGrantConfig) {
+    // use oauth2 instead of oAuth2
+    if (oauth2Config is ClientCredentialsGrantConfig) {
         oauth2:ClientCredentialsGrantConfig clientCredentialConfig = {
-            tokenUrl: string `https://login.microsoftonline.com/${oAuth2Config.tenantID}/oauth2/v2.0/token`,
-            clientId: oAuth2Config.clientId,
-            clientSecret: oAuth2Config.clientSecret,
-            clockSkewInSeconds: oAuth2Config.clockSkewInSeconds,
-            retryRequest: oAuth2Config.retryRequest,
-            credentialBearer: oAuth2Config.credentialBearer,
-            clientConfig: oAuth2Config.clientConfig
+            tokenUrl: string `https://login.microsoftonline.com/${oauth2Config.tenantId}/oauth2/v2.0/token`,
+            clientId: oauth2Config.clientId,
+            clientSecret: oauth2Config.clientSecret,
+            clockSkewInSeconds: oauth2Config.clockSkewInSeconds,
+            retryRequest: oauth2Config.retryRequest,
+            credentialBearer: oauth2Config.credentialBearer,
+            clientConfig: oauth2Config.clientConfig
         };
 
-        string[]? scopes = oAuth2Config?.scopes;
+        string[]? scopes = oauth2Config?.scopes;
         if (scopes is string[]) {
             clientCredentialConfig.scopes = scopes;
         }
 
         oAuthProvider = new oauth2:OutboundOAuth2Provider(clientCredentialConfig);
-    } else if (oAuth2Config is PasswordGrantConfig) {
+    } else if (oauth2Config is PasswordGrantConfig) {
         oauth2:PasswordGrantConfig passwordConfig = {
-            tokenUrl: string `https://login.microsoftonline.com/${oAuth2Config.tenantID}/oauth2/v2.0/token`,
-            username: oAuth2Config.username,
-            password: oAuth2Config.password,
-            clientId: oAuth2Config.clientId,
-            scopes: oAuth2Config.scopes,
-            clockSkewInSeconds: oAuth2Config.clockSkewInSeconds,
-            retryRequest: oAuth2Config.retryRequest,
-            credentialBearer: oAuth2Config.credentialBearer,
-            clientConfig: oAuth2Config.clientConfig
+            tokenUrl: string `https://login.microsoftonline.com/${oauth2Config.tenantId}/oauth2/v2.0/token`,
+            username: oauth2Config.username,
+            password: oauth2Config.password,
+            clientId: oauth2Config.clientId,
+            scopes: oauth2Config.scopes,
+            clockSkewInSeconds: oauth2Config.clockSkewInSeconds,
+            retryRequest: oauth2Config.retryRequest,
+            credentialBearer: oauth2Config.credentialBearer,
+            clientConfig: oauth2Config.clientConfig
         };
 
-        string? clientSecret = oAuth2Config?.clientSecret;
+        string? clientSecret = oauth2Config?.clientSecret;
         if (clientSecret is string) {
             passwordConfig.clientSecret = clientSecret;
         }
 
-        RefreshConfig? refreshConfig = oAuth2Config?.refreshConfig;
+        RefreshConfig? refreshConfig = oauth2Config?.refreshConfig;
         if (refreshConfig is RefreshConfig) {
             oauth2:RefreshConfig oauth2RefreshConfig = {
                 refreshUrl: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
@@ -71,17 +72,17 @@ public function getAzureADOutboundOAuth2BearerHandler(ClientCredentialsGrantConf
         oAuthProvider = new oauth2:OutboundOAuth2Provider(passwordConfig);
     } else {
         oauth2:DirectTokenConfig directTokenConfig = {
-            clockSkewInSeconds: oAuth2Config.clockSkewInSeconds,
-            retryRequest: oAuth2Config.retryRequest,
-            credentialBearer: oAuth2Config.credentialBearer
+            clockSkewInSeconds: oauth2Config.clockSkewInSeconds,
+            retryRequest: oauth2Config.retryRequest,
+            credentialBearer: oauth2Config.credentialBearer
         };
 
-        string? accessToken = oAuth2Config?.accessToken;
+        string? accessToken = oauth2Config?.accessToken;
         if (accessToken is string) {
             directTokenConfig.accessToken = accessToken;
         }
 
-        DirectTokenRefreshConfig? refreshConfig = oAuth2Config?.refreshConfig;
+        DirectTokenRefreshConfig? refreshConfig = oauth2Config?.refreshConfig;
         if (refreshConfig is DirectTokenRefreshConfig) {
             oauth2:DirectTokenRefreshConfig oauth2DirectRefreshConfig = {
                 refreshUrl: "https://login.microsoftonline.com/common/oauth2/v2.0/token",

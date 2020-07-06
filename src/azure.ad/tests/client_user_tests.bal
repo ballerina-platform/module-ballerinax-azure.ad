@@ -82,20 +82,10 @@ function createUserWithInvalidFieldsTest() {
         ...additionalAttributes
     };
 
-    User|error createdUser = adClient->createUser(newUser);
-    if (createdUser is error) {
-        error? adError = createdUser.detail()?.cause;
-        if (adError is ()) {
-            test:assertFail("There should be an Graph API error");
-        } else {
-            if (adError is GraphAPIError) {
-                test:assertEquals(adError.reason(), "Request_BadRequest");
-                test:assertEquals(adError.detail()?.message, "One or more property values specified are invalid.");
-            } else {
-                test:assertFail("Invalid error type found");
-            }
-        }
-
+    User|AdClientError createdUser = adClient->createUser(newUser);
+    if (createdUser is AdClientError) {
+        test:assertEquals(createdUser.reason(), "Request_BadRequest");
+        test:assertEquals(createdUser.detail()?.message, "One or more property values specified are invalid.");
     } else {
         test:assertFail("User was not supposed to get created");
     }
@@ -152,22 +142,12 @@ function deleteNonExistingUser() {
         userPrincipalName: "arnoldwesker@" + TENANT_DOMAIN,
         id: "648d7dae-f87d-44a4-b92f-eb2fd85ac52a"
     };
-     error? deleteError = adClient->deleteUser(invalidUser);
-     if (deleteError is error) {
-        error? adError = deleteError.detail()?.cause;
-        if (adError is ()) {
-            test:assertFail("There should be an Graph API error");
-        } else {
-            if (adError is GraphAPIError) {
-                test:assertEquals(adError.reason(), "Request_ResourceNotFound");
-                test:assertEquals(adError.detail()?.message, "Resource 'arnoldwesker@" + TENANT_DOMAIN + "' does not " + 
-                                                              "exist or one of its queried reference-property objects" +
-                                                              " are not present.");
-            } else {
-                test:assertFail("Invalid error type found");
-            }
-        }
-
+     AdClientError? deleteError = adClient->deleteUser(invalidUser);
+     if (deleteError is AdClientError) {
+        test:assertEquals(deleteError.reason(), "Request_ResourceNotFound");
+        test:assertEquals(deleteError.detail()?.message, "Resource 'arnoldwesker@" + TENANT_DOMAIN + "' does not " + 
+                                                        "exist or one of its queried reference-property objects" +
+                                                        " are not present.");
     } else {
         test:assertFail("User was not supposed to get created");
     }

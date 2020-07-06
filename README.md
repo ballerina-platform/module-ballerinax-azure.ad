@@ -26,13 +26,13 @@ Instantiate the `ad:Client` by giving OAuth2 authentication details in the `ad:C
 You can define the Azure AD configuration and create the Azure AD client as follows. 
 ```ballerina
 ad:ClientCredentialsGrantConfig clientCredentialOAuth2Config = {
-    tenantID: "",
+    tenantId: "",
     clientId: "",
     clientSecret: ""
 };
 
 ad:ClientConfiguration clientConfig = {
-    authHandler: ad:getAzureADOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
+    authHandler: ad:getAzureAdOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
 };
 ad:Client adClient = new(clientConfig);
 ```
@@ -43,7 +43,7 @@ Microsoft Graph API.
 
 The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
-ad:getAzureADOutboundOAuth2BearerHandler(...)
+ad:getAzureAdOutboundOAuth2BearerHandler(...)
 ```
 
 See examples at https://github.com/ballerina-platform/module-ballerinax-azure.ad/blob/ad-implementation/src/azure.ad/tests/client_auth_tests.bal
@@ -55,7 +55,7 @@ The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
 public listener http:Listener myEP = new(9090, {
     auth: {
-        authHandlers: [ad:getAzureADInboundBasicAuthHandler("", "", "")]
+        authHandlers: [ad:getAzureAdInboundBasicAuthHandler("", "", "")]
     },
     secureSocket: {
         keyStore: {

@@ -20,13 +20,13 @@ import ballerina/test;
 @test:Config {}
 public function clientCredentialsGrantClientTest() {
     ClientCredentialsGrantConfig clientCredentialOAuth2Config = {
-        tenantID: TENANT_ID,
+        tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET
     };
 
     ClientConfiguration clientConfig = {
-        authHandler: getAzureADOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
+        authHandler: getAzureAdOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
     };
 
     Client adClient = new(clientConfig);
@@ -36,7 +36,7 @@ public function clientCredentialsGrantClientTest() {
 @test:Config {}
 public function passwordGrantClientTest() {
     PasswordGrantConfig passwordGrantConfig = {
-        tenantID: TENANT_ID,
+        tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
         username: config:getAsString("ad.users.user1.username"),
@@ -44,7 +44,7 @@ public function passwordGrantClientTest() {
     };
 
     ClientConfiguration clientConfig = {
-        authHandler: getAzureADOutboundOAuth2BearerHandler(passwordGrantConfig)
+        authHandler: getAzureAdOutboundOAuth2BearerHandler(passwordGrantConfig)
     };
 
     Client adClient = new(clientConfig);

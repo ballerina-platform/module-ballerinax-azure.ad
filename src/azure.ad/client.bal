@@ -47,11 +47,11 @@ public type Client client object {
     # 
     # + newUser - New user entry
     # + return - Newly created User or error when creating it
-    public remote function createUser(NewUser newUser) returns @tainted User|ADClientError {
+    public remote function createUser(NewUser newUser) returns @tainted User|AdClientError {
         json newUserJson = checkpanic json.constructFrom(newUser);
         http:Response|error newUserResponseOrError = self.graphClient->post("/users/", newUserJson);
         if newUserResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = newUserResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = newUserResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -59,21 +59,19 @@ public type Client client object {
         json|error userJsonOrError = newUserResponse.getJsonPayload();
 
         if userJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
             return <@untainted>clientErr;
         }
 
         json userJson = <json>userJsonOrError;
         if newUserResponse.statusCode != 201 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(userJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred creating user", cause = graphAPIError);
-            return clientErr;
+            return parseError(userJson);
         }
 
         User|error userOrError = User.constructFrom(userJson);
 
         if userOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
             return <@untainted>clientErr;
         }
 
@@ -82,13 +80,14 @@ public type Client client object {
 
     # Get users in the active directory.
     # 
+    # // Pagination implementation
     # + top - Maximum number of users to return
     # + filter - Filter users based on odata filtering
     # + return - The users or error when retrieving users
-    public remote function getUsers(public int top = 100, public string filter = "") returns @tainted User[]|ADClientError {
+    public remote function getUsers(public int top = 100, public string filter = "") returns @tainted User[]|AdClientError {
         http:Response|error getUsersResponseOrError = self.graphClient->get(string `/users?$top=${top}&$filter=${filter}`);
         if getUsersResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUsersResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUsersResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -96,15 +95,13 @@ public type Client client object {
         json|error usersJsonOrError = getUsersResponse.getJsonPayload();
 
         if usersJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = usersJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = usersJsonOrError);
             return <@untainted>clientErr;
         }
 
         json usersJson = <json>usersJsonOrError;
         if getUsersResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(usersJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting users", cause = graphAPIError);
-            return clientErr;
+            return parseError(usersJson);
         }
 
         json[] usersJsons = <json[]>checkpanic usersJson.value;
@@ -113,7 +110,7 @@ public type Client client object {
             User|error userOrError = User.constructFrom(userJson);
 
             if userOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
                 return <@untainted>clientErr;
             }
 
@@ -128,10 +125,10 @@ public type Client client object {
     # + userID - User ID or User Principal Name of the user
     # + additionalFields - Additional fields to select from the user
     # + return - The user or error when retrieving the user
-    public remote function getUser(string userID, public string[] additionalFields = []) returns @tainted User|ADClientError {
+    public remote function getUser(string userID, public string[] additionalFields = []) returns @tainted User|AdClientError {
         http:Response|error getUserResponseOrError = self.graphClient->get(string `/users/${userID}`);
         if getUserResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -139,15 +136,13 @@ public type Client client object {
         json|error userJsonOrError = getUserResponse.getJsonPayload();
 
         if userJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
             return <@untainted>clientErr;
         }
 
         json userJson = <json>userJsonOrError;
         if getUserResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(userJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting user", cause = graphAPIError);
-            return clientErr;
+            return parseError(userJson);
         }
 
         json userSelectJson = {};
@@ -156,7 +151,7 @@ public type Client client object {
 
             http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/users/${userID}?$select=${select}`);
             if getUserSelectResponseOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
                 return <@untainted>clientErr;
             }
 
@@ -164,15 +159,13 @@ public type Client client object {
             json|error userSelectJsonOrError = getUserSelectResponse.getJsonPayload();
 
             if userSelectJsonOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userSelectJsonOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userSelectJsonOrError);
                 return <@untainted>clientErr;
             }
 
             userSelectJson = <json>userSelectJsonOrError;
             if getUserSelectResponse.statusCode != 200 {
-                GraphAPIError|InvalidErrorPayload graphAPIError = parseError(userSelectJson);
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting user", cause = graphAPIError);
-                return clientErr;
+                return parseError(userSelectJson);
             }
             map<json> userSelectJsonMap = <map<json>>userSelectJson;
             _ = userSelectJsonMap.remove("@odata.context");
@@ -182,7 +175,7 @@ public type Client client object {
         User|error userOrError = User.constructFrom(checkpanic userJson.mergeJson(userSelectJson));
 
         if userOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
             return <@untainted>clientErr;
         }
 
@@ -193,10 +186,10 @@ public type Client client object {
     # 
     # + additionalFields - Additional fields to retrieve
     # + return - The current user or error when retrieve
-    public remote function getCurrentUser(public string[] additionalFields = []) returns @tainted User|ADClientError {
+    public remote function getCurrentUser(public string[] additionalFields = []) returns @tainted User|AdClientError {
         http:Response|error getUserResponseOrError = self.graphClient->get("/me");
         if getUserResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -204,15 +197,13 @@ public type Client client object {
         json|error userJsonOrError = getUserResponse.getJsonPayload();
 
         if userJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userJsonOrError);
             return <@untainted>clientErr;
         }
 
         json userJson = <json>userJsonOrError;
         if getUserResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(userJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting current user", cause = graphAPIError);
-            return clientErr;
+            return parseError(userJson);
         }
 
         json userSelectJson = {};
@@ -221,7 +212,7 @@ public type Client client object {
 
             http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/me?$select=${select}`);
             if getUserSelectResponseOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
                 return <@untainted>clientErr;
             }
 
@@ -229,15 +220,13 @@ public type Client client object {
             json|error userSelectJsonOrError = getUserSelectResponse.getJsonPayload();
 
             if userSelectJsonOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userSelectJsonOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = userSelectJsonOrError);
                 return <@untainted>clientErr;
             }
 
             userSelectJson = <json>userSelectJsonOrError;
             if getUserSelectResponse.statusCode != 200 {
-                GraphAPIError|InvalidErrorPayload graphAPIError = parseError(userSelectJson);
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting current user", cause = graphAPIError);
-                return clientErr;
+                return parseError(userSelectJson);
             }
             map<json> userSelectJsonMap = <map<json>>userSelectJson;
             _ = userSelectJsonMap.remove("@odata.context");
@@ -246,7 +235,7 @@ public type Client client object {
         User|error userOrError = User.constructFrom(checkpanic userJson.mergeJson(userSelectJson));
 
         if userOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
             return <@untainted>clientErr;
         }
 
@@ -258,14 +247,14 @@ public type Client client object {
     # + user - The user
     # + manager - Manager of the user
     # + return - Error if occurred
-    public remote function assignManagerToUser(User user, User manager) returns @tainted ADClientError? {
+    public remote function assignManagerToUser(User user, User manager) returns @tainted AdClientError? {
         json managerIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/users/${manager.id}`
         };
         http:Response|error assignManagerResponseOrError = self.graphClient->put(string `/users/${user.id}/manager/$ref`, managerIDJson);
 
         if assignManagerResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = assignManagerResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = assignManagerResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -277,24 +266,22 @@ public type Client client object {
         json|error assignManagerErrorJsonOrError = assignManagerResponse.getJsonPayload();
 
         if assignManagerErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = assignManagerErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = assignManagerErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json assignErrorJson = <json>assignManagerErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(assignErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred assigning manager to user", cause = graphAPIError);
-        return clientErr;
+        return parseError(assignErrorJson);
     }
     
     # Get the manager of a user.
     # 
     # + user - The user
     # + return - The manager or error when retrieve
-    public remote function getManagerOfUser(User user) returns @tainted User|ADClientError {
+    public remote function getManagerOfUser(User user) returns @tainted User|AdClientError {
         http:Response|error getManagerResponseOrError = self.graphClient->get(string `/users/${user.userPrincipalName}/manager`);
         if getManagerResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getManagerResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getManagerResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -302,21 +289,19 @@ public type Client client object {
         json|error managerJsonOrError = getManagerResponse.getJsonPayload();
 
         if managerJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = managerJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = managerJsonOrError);
             return <@untainted>clientErr;
         }
 
         json managerJson = <json>managerJsonOrError;
         if getManagerResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(managerJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting manager of user", cause = graphAPIError);
-            return clientErr;
+            return parseError(managerJson);
         }
 
         User|error managerOrError = User.constructFrom(managerJson);
 
         if managerOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = managerOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = managerOrError);
             return <@untainted>clientErr;
         }
 
@@ -327,11 +312,11 @@ public type Client client object {
     # 
     # + user - The User
     # + return - Error if occurred when retrieving
-    public remote function updateUser(User user) returns @tainted ADClientError? {
+    public remote function updateUser(User user) returns @tainted AdClientError? {
         json userJson = checkpanic json.constructFrom(user);
         http:Response|error udpateUserResponseOrError = self.graphClient->patch(string `/users/${user.userPrincipalName}`, userJson);
         if udpateUserResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = udpateUserResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = udpateUserResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -343,25 +328,23 @@ public type Client client object {
         json|error updateErrorJsonOrError = udpateUserResponse.getJsonPayload();
 
         if updateErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = updateErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = updateErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json updateErrorJson = <json>updateErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(updateErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred updating user", cause = graphAPIError);
-        return clientErr;
+        return parseError(updateErrorJson);
     }
 
     # Delete the user.
     # 
     # + user - The user
     # + return - Error if occurred when retrieving
-    public remote function deleteUser(User user) returns @tainted ADClientError? {
+    public remote function deleteUser(User user) returns @tainted AdClientError? {
         http:Response|error deleteUserResponseOrError = self.graphClient->delete(string `/users/${user.userPrincipalName}`);
 
         if deleteUserResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = deleteUserResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = deleteUserResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -373,25 +356,23 @@ public type Client client object {
         json|error deleteErrorJsonOrError = deleteUserResponse.getJsonPayload();
 
         if deleteErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = deleteErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = deleteErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json deleteErrorJson = <json>deleteErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(deleteErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred deleting user", cause = graphAPIError);
-        return clientErr;
+        return parseError(deleteErrorJson);
     }
 
     # Creates a group
     # 
     # + newGroup - The new group to add
     # + return - The group or error when retrieving
-    public remote function createGroup(NewGroup newGroup) returns @tainted Group|ADClientError {
+    public remote function createGroup(NewGroup newGroup) returns @tainted Group|AdClientError {
         json newGroupJson = checkpanic json.constructFrom(newGroup);
         http:Response|error newGroupResponseOrError = self.graphClient->post("/groups/", newGroupJson);
         if newGroupResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = newGroupResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = newGroupResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -399,21 +380,19 @@ public type Client client object {
         json|error groupJsonOrError = newGroupResponse.getJsonPayload();
 
         if groupJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupJsonOrError);
             return <@untainted>clientErr;
         }
 
         json groupJson = <json>groupJsonOrError;
         if newGroupResponse.statusCode != 201 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(groupJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred creating group", cause = graphAPIError);
-            return clientErr;
+            return parseError(groupJson);
         }
 
         Group|error groupOrError = Group.constructFrom(groupJson);
 
         if groupOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
             return <@untainted>clientErr;
         }
 
@@ -425,10 +404,10 @@ public type Client client object {
     # + top - Number of results
     # + filter - OData filtering
     # + return - Groups or error when retrieving
-    public remote function getGroups(public int top = 100, public string filter = "") returns @tainted Group[]|ADClientError {
+    public remote function getGroups(public int top = 100, public string filter = "") returns @tainted Group[]|AdClientError {
         http:Response|error getGroupsResponseOrError = self.graphClient->get(string `/groups?$top=${top}&$filter=${filter}`);
         if getGroupsResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupsResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupsResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -436,15 +415,13 @@ public type Client client object {
         json|error groupsJsonOrError = getGroupsResponse.getJsonPayload();
 
         if groupsJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupsJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupsJsonOrError);
             return <@untainted>clientErr;
         }
 
         json groupsJson = <json>groupsJsonOrError;
         if getGroupsResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(groupsJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting groups", cause = graphAPIError);
-            return clientErr;
+            return parseError(groupsJson);
         }
 
         json[] groupsJsons = <json[]>checkpanic groupsJson.value;
@@ -453,7 +430,7 @@ public type Client client object {
             Group|error grouprOrError = Group.constructFrom(groupJson);
 
             if grouprOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = grouprOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = grouprOrError);
                 return <@untainted>clientErr;
             }
 
@@ -468,10 +445,10 @@ public type Client client object {
     # + groupID - The group ID
     # + additionalFields - Additional fields to select
     # + return - The group or error when retrieving
-    public remote function getGroup(string groupID, public string[] additionalFields = []) returns @tainted Group|ADClientError {
+    public remote function getGroup(string groupID, public string[] additionalFields = []) returns @tainted Group|AdClientError {
         http:Response|error getGroupResponseOrError = self.graphClient->get(string `/groups/${groupID}`);
         if getGroupResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -479,15 +456,13 @@ public type Client client object {
         json|error groupJsonOrError = getGroupResponse.getJsonPayload();
 
         if groupJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupJsonOrError);
             return <@untainted>clientErr;
         }
 
         json groupJson = <json>groupJsonOrError;
         if getGroupResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(groupJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting group", cause = graphAPIError);
-            return clientErr;
+            return parseError(groupJson);
         }
 
         json groupSelectJson = {};
@@ -496,7 +471,7 @@ public type Client client object {
 
             http:Response|error getGroupSelectResponseOrError = self.graphClient->get(string `/groups/${groupID}?$select=${select}`);
             if getGroupSelectResponseOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupSelectResponseOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupSelectResponseOrError);
                 return <@untainted>clientErr;
             }
 
@@ -504,15 +479,13 @@ public type Client client object {
             json|error groupSelectJsonOrError = getGroupSelectResponse.getJsonPayload();
 
             if groupSelectJsonOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupSelectJsonOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = groupSelectJsonOrError);
                 return <@untainted>clientErr;
             }
 
             groupSelectJson = <json>groupSelectJsonOrError;
             if getGroupSelectResponse.statusCode != 200 {
-                GraphAPIError|InvalidErrorPayload graphAPIError = parseError(groupSelectJson);
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting group", cause = graphAPIError);
-                return clientErr;
+                return parseError(groupSelectJson);
             }
             map<json> groupSelectJsonMap = <map<json>>groupSelectJson;
             _ = groupSelectJsonMap.remove("@odata.context");
@@ -522,7 +495,7 @@ public type Client client object {
         Group|error groupOrError = Group.constructFrom(checkpanic groupJson.mergeJson(groupSelectJson));
 
         if groupOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
             return <@untainted>clientErr;
         }
 
@@ -533,11 +506,11 @@ public type Client client object {
     # 
     # + group - The group to update
     # + return - Error if occurred when retrieving
-    public remote function updateGroup(Group group) returns @tainted ADClientError? {
+    public remote function updateGroup(Group group) returns @tainted AdClientError? {
         json groupJson = checkpanic json.constructFrom(group);
         http:Response|error udpateGroupResponseOrError = self.graphClient->patch(string `/groups/${group.id}`, groupJson);
         if udpateGroupResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = udpateGroupResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = udpateGroupResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -549,25 +522,23 @@ public type Client client object {
         json|error updateErrorJsonOrError = udpateGroupResponse.getJsonPayload();
 
         if updateErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = updateErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = updateErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json updateErrorJson = <json>updateErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(updateErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred updating group", cause = graphAPIError);
-        return clientErr;
+        return parseError(updateErrorJson);
     }
 
     # Delete a group
     # 
     # + group - Group to delete
     # + return - Error if occurred when retrieving
-    public remote function deleteGroup(Group group) returns @tainted ADClientError? {
+    public remote function deleteGroup(Group group) returns @tainted AdClientError? {
         http:Response|error deleteGroupResponseOrError = self.graphClient->delete(string `/groups/${group.id}`);
 
         if deleteGroupResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = deleteGroupResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = deleteGroupResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -579,14 +550,12 @@ public type Client client object {
         json|error deleteErrorJsonOrError = deleteGroupResponse.getJsonPayload();
 
         if deleteErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = deleteErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = deleteErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json deleteErrorJson = <json>deleteErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(deleteErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred deleting group", cause = graphAPIError);
-        return clientErr;
+        return parseError(deleteErrorJson);
     }
 
     # Add a member to a group
@@ -594,14 +563,14 @@ public type Client client object {
     # + group - The group
     # + member - The member to be added to the group
     # + return - Error if occurred when retrieving
-    public remote function addMemberToGroup(Group group, User|Group|Device member) returns @tainted ADClientError? {
+    public remote function addMemberToGroup(Group group, User|Group|Device member) returns @tainted AdClientError? {
         json memberIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}`
         };
         http:Response|error addMemberResponseOrError = self.graphClient->post(string `/groups/${group.id}/members/$ref`, memberIDJson);
 
         if addMemberResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = addMemberResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = addMemberResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -613,14 +582,12 @@ public type Client client object {
         json|error addMemberErrorJsonOrError = addMemberResponse.getJsonPayload();
 
         if addMemberErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = addMemberErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = addMemberErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json addMemberErrorJson = <json>addMemberErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(addMemberErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred adding member to group", cause = graphAPIError);
-        return clientErr;
+        return parseError(addMemberErrorJson);
     }
 
     # Get members of a group.
@@ -629,10 +596,10 @@ public type Client client object {
     # + top - The number of results
     # + filter - OData filtering
     # + return - The members of the group or error when retrieving
-    public remote function getGroupMembers(Group group, public int top = 100, public string filter = "") returns @tainted (User|Group|Device)[]|ADClientError {
+    public remote function getGroupMembers(Group group, public int top = 100, public string filter = "") returns @tainted (User|Group|Device)[]|AdClientError {
         http:Response|error getMembersResponseOrError = self.graphClient->get(string `/groups/${group.id}/members?$top=${top}&$filter=${filter}`);
         if getMembersResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getMembersResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getMembersResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -640,15 +607,13 @@ public type Client client object {
         json|error membersJsonOrError = getMembersResponse.getJsonPayload();
 
         if membersJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = membersJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = membersJsonOrError);
             return <@untainted>clientErr;
         }
 
         json membersJson = <json>membersJsonOrError;
         if getMembersResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(membersJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting users", cause = graphAPIError);
-            return clientErr;
+            return parseError(membersJson);
         }
 
         json[] membersJsons = <json[]>checkpanic membersJson.value;
@@ -659,7 +624,7 @@ public type Client client object {
                     User|error userOrError = User.constructFrom(memberJson);
 
                     if userOrError is error {
-                        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+                        AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
                         return <@untainted>clientErr;
                     }
 
@@ -669,7 +634,7 @@ public type Client client object {
                     Group|error groupOrError = Group.constructFrom(memberJson);
 
                     if groupOrError is error {
-                        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
+                        AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting group", cause = groupOrError);
                         return <@untainted>clientErr;
                     }
 
@@ -679,7 +644,7 @@ public type Client client object {
                     Device|error deviceOrError = Device.constructFrom(memberJson);
 
                     if deviceOrError is error {
-                        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting device", cause = deviceOrError);
+                        AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting device", cause = deviceOrError);
                         return <@untainted>clientErr;
                     }
 
@@ -696,11 +661,11 @@ public type Client client object {
     # + group - The group
     # + member - The member to be removed
     # + return - Error if occurred
-    public remote function removeMemberFromGroup(Group group, User|Group|Device member) returns @tainted ADClientError? {
+    public remote function removeMemberFromGroup(Group group, User|Group|Device member) returns @tainted AdClientError? {
         http:Response|error removeMemberResponseOrError = self.graphClient->delete(string `/groups/${group.id}/members/${member.id}/$ref`);
 
         if removeMemberResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = removeMemberResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = removeMemberResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -712,14 +677,12 @@ public type Client client object {
         json|error removeMemberErrorJsonOrError = removeMemberResponse.getJsonPayload();
 
         if removeMemberErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = removeMemberErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = removeMemberErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json removeMemberErrorJson = <json>removeMemberErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(removeMemberErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred deleting group", cause = graphAPIError);
-        return clientErr;
+        return parseError(removeMemberErrorJson);
     }
 
     # Add owner to a group.
@@ -727,14 +690,14 @@ public type Client client object {
     # + group - The group
     # + owner - New owner to be added
     # + return - Error if occurred
-    public remote function addOwnerToGroup(Group group, User owner) returns @tainted ADClientError? {
+    public remote function addOwnerToGroup(Group group, User owner) returns @tainted AdClientError? {
         json ownerIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/users/${owner.id}`
         };
         http:Response|error addOwnerResponseOrError = self.graphClient->post(string `/groups/${group.id}/owners/$ref`, ownerIDJson);
 
         if addOwnerResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = addOwnerResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = addOwnerResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -746,14 +709,12 @@ public type Client client object {
         json|error addOwnerErrorJsonOrError = addOwnerResponse.getJsonPayload();
 
         if addOwnerErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = addOwnerErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = addOwnerErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json addOwnerErrorJson = <json>addOwnerErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(addOwnerErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred adding owner to group", cause = graphAPIError);
-        return clientErr;
+        return parseError(addOwnerErrorJson);
     }
 
     # Get owners of a group.
@@ -762,10 +723,10 @@ public type Client client object {
     # + top - The number of owners
     # + filter - OData filtering
     # + return - The owners or error occurred when retrieving
-    public remote function getGroupOwners(Group group, public int top = 100, public string filter = "") returns @tainted User[]|ADClientError {
+    public remote function getGroupOwners(Group group, public int top = 100, public string filter = "") returns @tainted User[]|AdClientError {
         http:Response|error getOwnersResponseOrError = self.graphClient->get(string `/groups/${group.id}/owners?$top=${top}&$filter=${filter}`);
         if getOwnersResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getOwnersResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getOwnersResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -773,15 +734,13 @@ public type Client client object {
         json|error ownersJsonOrError = getOwnersResponse.getJsonPayload();
 
         if ownersJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = ownersJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = ownersJsonOrError);
             return <@untainted>clientErr;
         }
 
         json ownersJson = <json>ownersJsonOrError;
         if getOwnersResponse.statusCode != 200 {
-            GraphAPIError|InvalidErrorPayload graphAPIError = parseError(ownersJson);
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred getting group owners", cause = graphAPIError);
-            return clientErr;
+            return parseError(ownersJson);
         }
 
         json[] ownersJsonsMap = <json[]>checkpanic ownersJson.value;
@@ -790,7 +749,7 @@ public type Client client object {
             User|error userOrError = User.constructFrom(ownerJson);
 
             if userOrError is error {
-                ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
+                AdClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred converting user", cause = userOrError);
                 return <@untainted>clientErr;
             }
 
@@ -805,11 +764,11 @@ public type Client client object {
     # + group - The group.
     # + owner - The owner to be removed
     # + return - Error if occurred when retrieving
-    public remote function removeOwnerFromGroup(Group group, User owner) returns @tainted ADClientError? {
+    public remote function removeOwnerFromGroup(Group group, User owner) returns @tainted AdClientError? {
         http:Response|error removeOwnerResponseOrError = self.graphClient->delete(string `/groups/${group.id}/owners/${owner.id}/$ref`);
 
         if removeOwnerResponseOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = removeOwnerResponseOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = removeOwnerResponseOrError);
             return <@untainted>clientErr;
         }
 
@@ -821,13 +780,11 @@ public type Client client object {
         json|error removeOwnerErrorJsonOrError = removeOwnerResponse.getJsonPayload();
 
         if removeOwnerErrorJsonOrError is error {
-            ADClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = removeOwnerErrorJsonOrError);
+            AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unknown payload format recieved", cause = removeOwnerErrorJsonOrError);
             return <@untainted>clientErr;
         }
 
         json removeOwnerErrorJson = <json>removeOwnerErrorJsonOrError;
-        GraphAPIError|InvalidErrorPayload graphAPIError = parseError(removeOwnerErrorJson);
-        ADClientError clientErr = error(AD_CLIENT_ERROR, message = "error occurred deleting group owner", cause = graphAPIError);
-        return clientErr;
+        return parseError(removeOwnerErrorJson);
     }
 };

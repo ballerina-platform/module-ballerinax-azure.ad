@@ -18,7 +18,7 @@ import ballerina/http;
 
 # The data structure, which is used to configure the OAuth2 client credentials grant type.
 #
-# + tenantID - Tenant ID for the active directory
+# + tenantId - Tenant ID for the active directory
 # + clientId - Client ID for the client credentials grant authentication
 # + clientSecret - Client secret for the client credentials grant authentication
 # + scopes - Scope(s) of the access request
@@ -27,7 +27,7 @@ import ballerina/http;
 # + credentialBearer - Bearer of the authentication credentials, which is sent to the authorization endpoint
 # + clientConfig - HTTP client configurations, which are used to call the authorization endpoint
 public type ClientCredentialsGrantConfig record {|
-    string tenantID;
+    string tenantId;
     string clientId;
     string clientSecret;
     string[] scopes = ["https://graph.microsoft.com/.default"];
@@ -39,7 +39,7 @@ public type ClientCredentialsGrantConfig record {|
 
 # The data structure, which is used to configure the OAuth2 password grant type.
 #
-# + tenantID - Tenant ID for the active directory
+# + tenantId - Tenant ID for the active directory
 # + username - Username for the password grant authentication
 # + password - Password for the password grant authentication
 # + clientId - Client ID for the password grant authentication
@@ -51,7 +51,7 @@ public type ClientCredentialsGrantConfig record {|
 # + credentialBearer - Bearer of the authentication credentials, which is sent to the authorization endpoint
 # + clientConfig - HTTP client configurations, which are used to call the authorization endpoint
 public type PasswordGrantConfig record {|
-    string tenantID;
+    string tenantId;
     string username;
     string password;
     string clientId;
@@ -66,14 +66,14 @@ public type PasswordGrantConfig record {|
 
 # The data structure, which is used to configure the OAuth2 access token directly.
 #
-# + tenantID - Tenant ID for the active directory
+# + tenantId - Tenant ID for the active directory
 # + accessToken - Access token for the authorization endpoint
 # + refreshConfig - Configurations for refreshing the access token
 # + clockSkewInSeconds - Clock skew in seconds
 # + retryRequest - Retry the request if the initial request returns a 401 response
 # + credentialBearer - Bearer of the authentication credentials, which is sent to the authorization endpoint
 public type DirectTokenConfig record {|
-    string tenantID;
+    string tenantId;
     string accessToken?;
     DirectTokenRefreshConfig refreshConfig?;
     int clockSkewInSeconds = 0;

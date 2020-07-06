@@ -20,9 +20,22 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/runtime;
 
+
+public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
+    InboundAzureAdUserAuthenticatorProviderConfig providerConfig = {
+        tenantId: TENANT_ID,
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET
+    };
+
+    InboundAzureAdUserAuthenticatorProvider inboundAzureAdUserAuthenticatorProvider = new(providerConfig);
+    http:BasicAuthHandler basicAuthHandler = new(inboundAzureAdUserAuthenticatorProvider);
+    return basicAuthHandler;
+}
+
 public listener http:Listener shopEP = new(9090, {
     auth: {
-        authHandlers: [getAzureADInboundBasicAuthHandler(TENANT_DOMAIN, CLIENT_ID, CLIENT_SECRET)]
+        authHandlers: [getAzureAdInboundBasicAuthHandler()]
     },
     secureSocket: {
         keyStore: {

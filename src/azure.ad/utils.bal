@@ -15,26 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-function parseError(json errorJsonPayload) returns GraphAPIError|InvalidErrorPayload {
+function parseError(json errorJsonPayload) returns AdClientError {
     json|error errorJsonOrError = errorJsonPayload.'error;
 
     if (errorJsonOrError is error) {
-        InvalidErrorPayload payloadError = InvalidErrorPayload(message = "unable to parse json error payload: " + errorJsonPayload.toJsonString());
-        return payloadError;
+        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to parse json error payload: " + errorJsonPayload.toJsonString());
+        return adClientError;
     }
 
     json errorJson = <json>errorJsonOrError;
     json|error codeJsonOrError = errorJson.code;
     if (codeJsonOrError is error) {
-        InvalidErrorPayload payloadError = InvalidErrorPayload(message = "unable to find error code: " + errorJsonPayload.toJsonString());
-        return payloadError;
+        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to find error code: " + errorJsonPayload.toJsonString());
+        return adClientError;
     }
     json codeJson  = <json>codeJsonOrError;
 
     json|error messageJsonOrError = errorJson.message;
     if (messageJsonOrError is error) {
-        InvalidErrorPayload payloadError = InvalidErrorPayload(message = "unable to find error message: " + errorJsonPayload.toJsonString());
-        return payloadError;
+        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to find error message: " + errorJsonPayload.toJsonString());
+        return adClientError;
     }
     json messageJson = <json>messageJsonOrError;
 
@@ -47,6 +47,6 @@ function parseError(json errorJsonPayload) returns GraphAPIError|InvalidErrorPay
         }
     }
     
-    GraphAPIError generalError = error(codeJson.toString(), message = messageJson.toString(), innerError = details);
+    AdClientError generalError = error(codeJson.toString(), message = messageJson.toString(), details = details);
     return generalError;
 }

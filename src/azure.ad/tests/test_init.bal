@@ -16,7 +16,7 @@
 
 import ballerina/config;
 
-final string TENANT_ID = config:getAsString("tenantID");
+final string TENANT_ID = config:getAsString("tenantId");
 final string CLIENT_ID = config:getAsString("clientId");
 final string CLIENT_SECRET = config:getAsString("clientSecret");
 final string TENANT_DOMAIN = config:getAsString("tenantDomain");
@@ -25,13 +25,13 @@ Client adClient = getClient();
 
 public function getClient() returns Client {
     ClientCredentialsGrantConfig clientCredentialOAuth2Config = {
-        tenantID: TENANT_ID,
+        tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET
     };
 
     ClientConfiguration clientConfig = {
-        authHandler: getAzureADOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
+        authHandler: getAzureAdOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
     };
 
     Client adClient = new(clientConfig);

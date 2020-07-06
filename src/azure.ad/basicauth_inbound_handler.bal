@@ -16,46 +16,43 @@
 
 import ballerina/auth;
 import ballerina/http;
-import ballerina/mime;
 import ballerina/lang.'string as sutils;
 
-# Creates an inbound auth handler which authenticates users against the active directory based on basic auth headers.
+# Configuration for azure active directory authenticator provider
 # 
 # + tenantId - Tenant ID for the active directory
 # + clientId - Client ID for the client credentials grant authentication
 # + clientSecret - Client secret for the client credentials grant authentication
 # + scopes - Scope(s) of the access request
-# + return - Inbound basic auth handler
-public function getAzureADInboundBasicAuthHandler(string tenantId, string clientId, string clientSecret, string|string[] scopes = ["https://graph.microsoft.com/.default"]) returns http:BasicAuthHandler { 
-    InboundAzureADUserAuthenticatorProvider userAuthProvider = new(tenantId, clientId, clientSecret, scopes);
-    http:BasicAuthHandler basicAuthHandler = new(userAuthProvider);
-    return basicAuthHandler;
-}
+public type InboundAzureAdUserAuthenticatorProviderConfig record {|
+    string tenantId;
+    string clientId;
+    string clientSecret?;
+    string|string[] scopes = "";
+|};
 
 # An inbound authentication provider which validates used against the active directory when basis auth token is provided.
-public type InboundAzureADUserAuthenticatorProvider object {
+public type InboundAzureAdUserAuthenticatorProvider object {
 
     *auth:InboundAuthProvider;
 
+    private string tenantId;
     private string clientId;
-    private string clientSecret;
-    private string 'resource;
+    private string? clientSecret;
     private string|string[] scopes;
-    private http:Client msOAuth2Client;
 
     # Provides authentication based on the provided introspection configurations.
     #
     # + tenantId - Tenant ID for the active directory
     # + clientId - Client ID for the client credentials grant authentication
-    # + clientSecret - Client secret for the client credentials grant authentication
+    # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not reuqired
     # + scopes - Scope(s) of the access request
     # + 'resource - The resource which the authentication occurrs
-    public function __init(string tenantId, string clientId, string clientSecret, string|string[] scopes, string 'resource = "https://graph.microsoft.com") {
-        self.clientId = clientId;
-        self.clientSecret = clientSecret;
-        self.'resource = 'resource;
-        self.scopes = scopes;
-        self.msOAuth2Client = new(string `https://login.microsoftonline.com/${tenantId}/oauth2`);
+    public function __init(InboundAzureAdUserAuthenticatorProviderConfig providerConfig) {
+        self.tenantId = providerConfig.tenantId;
+        self.clientId = providerConfig.clientId;
+        self.clientSecret = providerConfig?.clientSecret;
+        self.scopes = providerConfig.scopes;
     }
 
     # Use OAuth2 password grant type to authenticate user based on their basic auth token.
@@ -63,6 +60,10 @@ public type InboundAzureADUserAuthenticatorProvider object {
     # + credential - The user's basic auth token
     # + return - `true` if authenticated, `false` if not authenticated, `error` if error occurred while authenticating
     public function authenticate(string credential) returns boolean|auth:Error {
+        if (credential == "") {
+            return false;
+        }
+
         // Format scopes into a string.
         string|string[] oAuthScopes = self.scopes;
         string oAuthScopesFormatted;
@@ -74,28 +75,23 @@ public type InboundAzureADUserAuthenticatorProvider object {
 
         [string, string] [username, password] = check auth:extractUsernameAndPassword(credential);
 
-        string payload = "grant_type=password&" +
-                         "client_id=" + self.clientId + "&" +
-                         "client_secret=" + self.clientSecret + "&" + 
-                         "resource=" + self.'resource + "&" + 
-                         "username=" + username + "&" +
-                         "password=" + password + "&" +
-                         "scope=" + oAuthScopesFormatted;
+        PasswordGrantConfig passwordGrantConfig = {
+            tenantId: self.tenantId,
+            clientId: self.clientId,
+            username: username,
+            password: password
+        };
 
-        // Send OAuth2 request.
-        http:Request oAuthRequest = new;
-        oAuthRequest.setTextPayload(<@untainted>payload, mime:APPLICATION_FORM_URLENCODED);
-        http:Response|error loginResponseOrError = self.msOAuth2Client->post("/token", oAuthRequest);
-
-        if (loginResponseOrError is error) {
-            return false;
+        string? clientSecret = self.clientSecret;
+        if (clientSecret is string) {
+            passwordGrantConfig.clientSecret = clientSecret;
         }
 
-        http:Response loginResponse = <http:Response>loginResponseOrError;
-        json loginJson = checkpanic loginResponse.getJsonPayload();
+        http:BearerAuthHandler bearerAuthHandler = getAzureAdOutboundOAuth2BearerHandler(passwordGrantConfig);
+        auth:OutboundAuthProvider provider = <auth:OutboundAuthProvider>bearerAuthHandler.authProvider;
 
         // Set AuthenticationContext
-        string accessToken = loginJson.access_token.toString();
+        string accessToken = check provider.generateToken();
         auth:setAuthenticationContext("oauth2", accessToken);
 
         // Set Principal
@@ -106,6 +102,6 @@ public type InboundAzureADUserAuthenticatorProvider object {
             auth:setPrincipal(username, username, oAuthScopes);
         }
 
-        return loginResponse.statusCode == 200;
+        return true;
     }
 };
