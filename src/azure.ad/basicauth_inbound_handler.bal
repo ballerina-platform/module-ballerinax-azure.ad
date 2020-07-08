@@ -18,7 +18,7 @@ import ballerina/auth;
 import ballerina/http;
 import ballerina/lang.'string as sutils;
 
-# Configuration for azure active directory authenticator provider
+# Configuration for an Azure active directory authenticator provider
 # 
 # + tenantId - Tenant ID for the active directory
 # + clientId - Client ID for the client credentials grant authentication
@@ -31,7 +31,7 @@ public type InboundAzureAdUserAuthenticatorProviderConfig record {|
     string|string[] scopes = "";
 |};
 
-# An inbound authentication provider which validates used against the active directory when basis auth token is provided.
+# An inbound authentication provider, which validates the used directory against the active one when the basic auth token is provided.
 public type InboundAzureAdUserAuthenticatorProvider object {
 
     *auth:InboundAuthProvider;
@@ -45,9 +45,9 @@ public type InboundAzureAdUserAuthenticatorProvider object {
     #
     # + tenantId - Tenant ID for the active directory
     # + clientId - Client ID for the client credentials grant authentication
-    # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not reuqired
+    # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not required
     # + scopes - Scope(s) of the access request
-    # + 'resource - The resource which the authentication occurrs
+    # + 'resource - The resource, in which the authentication occurs
     public function __init(InboundAzureAdUserAuthenticatorProviderConfig providerConfig) {
         self.tenantId = providerConfig.tenantId;
         self.clientId = providerConfig.clientId;
@@ -55,10 +55,10 @@ public type InboundAzureAdUserAuthenticatorProvider object {
         self.scopes = providerConfig.scopes;
     }
 
-    # Use OAuth2 password grant type to authenticate user based on their basic auth token.
+    # Use the OAuth2 password grant type to authenticate users based on their basic auth tokens.
     # 
     # + credential - The user's basic auth token
-    # + return - `true` if authenticated, `false` if not authenticated, `error` if error occurred while authenticating
+    # + return - `true` if authenticated, `false` if not authenticated, `error` if an error occurred while authenticating
     public function authenticate(string credential) returns boolean|auth:Error {
         if (credential == "") {
             return false;
@@ -90,11 +90,11 @@ public type InboundAzureAdUserAuthenticatorProvider object {
         http:BearerAuthHandler bearerAuthHandler = getAzureAdOutboundOAuth2BearerHandler(passwordGrantConfig);
         auth:OutboundAuthProvider provider = <auth:OutboundAuthProvider>bearerAuthHandler.authProvider;
 
-        // Set AuthenticationContext
+        // Set the `AuthenticationContext`.
         string accessToken = check provider.generateToken();
         auth:setAuthenticationContext("oauth2", accessToken);
 
-        // Set Principal
+        // Set the `Principal`.
         if (oAuthScopes is string) {
             string[] oAuthScopeArray = [oAuthScopes];
             auth:setPrincipal(username, username, oAuthScopeArray);

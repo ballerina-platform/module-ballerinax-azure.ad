@@ -100,7 +100,7 @@ public type RefreshConfig record {|
 # + clientSecret - Client secret for authentication with the authorization endpoint
 # + scopes - Scope(s) of the access request
 # + credentialBearer - Bearer of authentication credentials, which is sent to the authorization endpoint
-# + clientConfig - HTTP client configurations, which are used to call the authorization endpoint
+# + clientConfig - HTTP client configurations, which is used to call the authorization endpoint
 public type DirectTokenRefreshConfig record {|
     string refreshToken;
     string clientId;

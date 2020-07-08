@@ -17,13 +17,13 @@
 import ballerina/http;
 import ballerina/oauth2;
 
-# Creates an outbound auth handler which can be used by an http client.
+# Creates an outbound auth handler, which can be used by an HTTP client.
 # 
 # + oauth2Config - OAuth2 configuration for the client.
 # + return - Outbound auth handler.
 public function getAzureAdOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
     oauth2:OutboundOAuth2Provider oAuthProvider;
-    // use oauth2 instead of oAuth2
+    // use OAuth2 instead of OAuth2
     if (oauth2Config is ClientCredentialsGrantConfig) {
         oauth2:ClientCredentialsGrantConfig clientCredentialConfig = {
             tokenUrl: string `https://login.microsoftonline.com/${oauth2Config.tenantId}/oauth2/v2.0/token`,

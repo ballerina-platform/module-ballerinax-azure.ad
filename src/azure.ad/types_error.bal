@@ -14,14 +14,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-const AD_CLIENT_ERROR = "{ballerinax/azure.ad}AdClientError";
+public const AD_CLIENT_ERROR = "{ballerinax/azure.ad}AdClientError";
 
 public type AdClientError error<string, Details>;
 
-# Represents an error information returned from the Graph API
+# Represents an error information returned from the Graph API.
 # 
 # + message - The message of the error
-# + cause - Error cause if exists
+# + cause - Error cause if it is available
 # + details - Error details
 public type Details record {|
     string message;

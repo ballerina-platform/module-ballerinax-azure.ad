@@ -1,27 +1,27 @@
 # Ballerina Azure Active Directory Connector
 
-Azure AD Client Connector allows you to perform operations on Users and Group of an Azure AD. The operations performed using the v1.0 version of Microsoft Graph API. The client uses OAuth 2.0 authentication.
+Azure AD Client Connector allows you to perform operations on users and groups of an Azure AD. The operations are performed using the v1.0 version of Microsoft Graph API. The client uses OAuth 2.0 authentication.
 
 ### Compatibility
 |                     |    Version     |
 |:-------------------:|:--------------:|
-| Ballerina Language  | 1.2.4          |
+| Ballerina Language  | 1.2.x          |
 
 ### Sample
 
 **Create the Azure AD Client**
 
-First, execute the below command to download `ballerinax/azure.ad` module into the Ballerina module repository.
+First, execute the below command to download the `ballerinax/azure.ad` module into the Ballerina module repository.
 ```ballerina
 ballerina pull ballerinax/azure.ad
 ```
 
-Next import the module to your Ballerina project as below.
+Next, execute the command below to import the module to your Ballerina project.
 ```ballerina
 import ballerinax/azure.'ad as ad;
 ```
 
-Instantiate the `ad:Client` by giving OAuth2 authentication details in the `ad:ClientConfiguration`. 
+Instantiate the `ad:Client` by specifying the OAuth2 authentication details in the `ad:ClientConfiguration`. 
 
 You can define the Azure AD configuration and create the Azure AD client as follows. 
 ```ballerina
@@ -38,7 +38,7 @@ ad:Client adClient = new(clientConfig);
 ```
 
 ## Outbound Auth Handler for Azure Services
-This module provides an Outbound Auth Handler which can be configured to an http:Listener that connects to an 
+This module provides an Outbound Auth Handler, which can be configured to an `http:Listener`, which connects to a
 Microsoft Graph API.
 
 The Auth Handler can be retrieved by invoking the following function:
@@ -49,7 +49,7 @@ ad:getAzureAdOutboundOAuth2BearerHandler(...)
 See examples at https://github.com/ballerina-platform/module-ballerinax-azure.ad/blob/ad-implementation/src/azure.ad/tests/client_auth_tests.bal
 
 ## Inbound Auth Handler for User Authentication
-The module provides an Inbound AuthHandler which be plugged to any http:Listener where every incoming request gets authenticated against Azure AD. The requests must contain Basic Auth Headers.
+This module provides an Inbound AuthHandler, which can be plugged to any `http:Listener` in which every incoming request gets authenticated against Azure AD. The requests must contain the basic auth headers.
 
 The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
@@ -88,11 +88,11 @@ ad:NewUser newUser1 = {
 ad:User user = checkpanic adClient->createUser(newUser1);
 io:println(user.displayName);
 
-// Getting user by user principal name
+// Getting a user by the user's principal name
 user = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com");
 io:println(user.displayName);
 
-// Getting user with additional fields
+// Getting a user with additional fields
 user = checkpanic adClient->getUser("garfieldlynns@hemikak.onmicrosoft.com", additionalFields = ["postalCode"]);
 io:println(user["postalCode"]);
 
@@ -122,28 +122,27 @@ ad:Group createdGroup = checkpanic adClient->createGroup(newGroup1);
 // Get all the groups
 ad:Group[] adGroups = checkpanic adClient->getGroups();
 
-// Get group by ID
+// Get a group by its ID
 ad:Group adGroup = checkpanic adClient->getGroup("9f323ew5-b8jc-414c-9397-8cn791ob2231");
 
-// Add member to group
+// Add a member to a group
 checkpanic adClient->addMemberToGroup(<@untainted>adGroup, <@untainted>user);
 
-// Get group members
+// Get the members of a group
 (ad:User|ad:Group|ad:Device)[] members = checkpanic adClient->getGroupMembers(<@untainted>adGroup);
 
-// Remove member from group
+// Remove a member from a group
 checkpanic adClient->removeMemberFromGroup(<@untainted>adGroup, <@untainted>user);
 
-// Add an owner to group
+// Add an owner to a group
 checkpanic adClient->addOwnerToGroup(<@untainted>adGroup, <@untainted>user);
 
-// Get group owners
+// Get the group owners
 ad:User[] owners = checkpanic adClient->getGroupOwners(<@untainted>adGroup);
 
-// Remove an owner to group
+// Remove an owner from a group
 checkpanic adClient->removeOwnerFromGroup(<@untainted>adGroup, <@untainted>user);
 
-// Delete group
+// Delete a group
 checkpanic adClient->deleteGroup(<@untainted>adGroup);
 ```
-
