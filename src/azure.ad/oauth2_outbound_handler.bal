@@ -22,6 +22,12 @@ import ballerina/oauth2;
 # + oauth2Config - OAuth2 configuration for the client.
 # + return - Outbound auth handler.
 public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
+    oauth2:OutboundOAuth2Provider oAuthProvider = getOutboundOAuth2Provider(oauth2Config);
+    http:BearerAuthHandler bearerHandler = new(oAuthProvider);
+    return bearerHandler;
+}
+
+function getOutboundOAuth2Provider(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns oauth2:OutboundOAuth2Provider {
     oauth2:OutboundOAuth2Provider oAuthProvider;
     // use OAuth2 instead of OAuth2
     if (oauth2Config is ClientCredentialsGrantConfig) {
@@ -104,6 +110,5 @@ public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|Pass
         oAuthProvider = new oauth2:OutboundOAuth2Provider(directTokenConfig);
     }
 
-    http:BearerAuthHandler bearerHandler = new(oAuthProvider);
-    return bearerHandler;
+    return oAuthProvider;
 }
