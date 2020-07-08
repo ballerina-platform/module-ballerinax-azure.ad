@@ -147,9 +147,9 @@ public type Client client object {
 
         json userSelectJson = {};
         if (additionalFields != []) {
-            string select = sutils:'join(",", ...additionalFields);
+            string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/users/${userID}?$select=${select}`);
+            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/users/${userID}?$select=${selectFields}`);
             if getUserSelectResponseOrError is error {
                 AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
                 return <@untainted>clientErr;
@@ -208,9 +208,9 @@ public type Client client object {
 
         json userSelectJson = {};
         if (additionalFields != []) {
-            string select = sutils:'join(",", ...additionalFields);
+            string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/me?$select=${select}`);
+            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/me?$select=${selectFields}`);
             if getUserSelectResponseOrError is error {
                 AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getUserSelectResponseOrError);
                 return <@untainted>clientErr;
@@ -467,9 +467,9 @@ public type Client client object {
 
         json groupSelectJson = {};
         if (additionalFields != []) {
-            string select = sutils:'join(",", ...additionalFields);
+            string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getGroupSelectResponseOrError = self.graphClient->get(string `/groups/${groupID}?$select=${select}`);
+            http:Response|error getGroupSelectResponseOrError = self.graphClient->get(string `/groups/${groupID}?$select=${selectFields}`);
             if getGroupSelectResponseOrError is error {
                 AdClientError clientErr = error(AD_CLIENT_ERROR, message = "unable to connect to azure active directory", cause = getGroupSelectResponseOrError);
                 return <@untainted>clientErr;

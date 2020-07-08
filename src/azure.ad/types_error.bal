@@ -16,7 +16,7 @@
 
 public const AD_CLIENT_ERROR = "{ballerinax/azure.ad}AdClientError";
 
-public type AdClientError error<string, Details>;
+public type AdClientError error<Details>;
 
 # Represents an error information returned from the Graph API.
 # 
