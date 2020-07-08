@@ -91,9 +91,6 @@ public type InboundUserAuthenticatorProvider object {
         oauth2:OutboundOAuth2Provider oAuthProvider = getOutboundOAuth2Provider(passwordGrantConfig);
         http:BearerAuthHandler bearerAuthHandler = new(oAuthProvider);
 
-        // http:BearerAuthHandler bearerAuthHandler = getOutboundOAuth2BearerHandler(passwordGrantConfig);
-        // auth:OutboundAuthProvider provider = <auth:OutboundAuthProvider>bearerAuthHandler.authProvider;
-
         // Set the `AuthenticationContext`.
         string accessToken = check oAuthProvider.generateToken();
         auth:setAuthenticationContext("oauth2", accessToken);
