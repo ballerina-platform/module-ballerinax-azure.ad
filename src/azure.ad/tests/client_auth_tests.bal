@@ -26,7 +26,7 @@ public function clientCredentialsGrantClientTest() {
     };
 
     ClientConfiguration clientConfig = {
-        authHandler: getAzureAdOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
+        authHandler: getOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
     };
 
     Client adClient = new(clientConfig);
@@ -44,7 +44,7 @@ public function passwordGrantClientTest() {
     };
 
     ClientConfiguration clientConfig = {
-        authHandler: getAzureAdOutboundOAuth2BearerHandler(passwordGrantConfig)
+        authHandler: getOutboundOAuth2BearerHandler(passwordGrantConfig)
     };
 
     Client adClient = new(clientConfig);

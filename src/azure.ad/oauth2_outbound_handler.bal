@@ -21,7 +21,7 @@ import ballerina/oauth2;
 # 
 # + oauth2Config - OAuth2 configuration for the client.
 # + return - Outbound auth handler.
-public function getAzureAdOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
+public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
     oauth2:OutboundOAuth2Provider oAuthProvider;
     // use OAuth2 instead of OAuth2
     if (oauth2Config is ClientCredentialsGrantConfig) {

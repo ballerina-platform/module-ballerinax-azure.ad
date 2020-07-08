@@ -34,7 +34,7 @@ ad:ClientCredentialsGrantConfig clientCredentialOAuth2Config = {
 };
 
 ad:ClientConfiguration clientConfig = {
-    authHandler: ad:getAzureAdOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
+    authHandler: ad:getOutboundOAuth2BearerHandler(clientCredentialOAuth2Config)
 };
 ad:Client adClient = new(clientConfig);
 ```
@@ -45,7 +45,7 @@ Microsoft Graph API.
 
 The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
-ad:getAzureAdOutboundOAuth2BearerHandler(...)
+ad:getOutboundOAuth2BearerHandler(...)
 ```
 
 See examples at https://github.com/ballerina-platform/module-ballerinax-azure.ad/blob/ad-implementation/src/azure.ad/tests/client_auth_tests.bal

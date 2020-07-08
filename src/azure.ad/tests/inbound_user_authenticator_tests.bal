@@ -22,13 +22,13 @@ import ballerina/runtime;
 
 
 public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
-    InboundAzureAdUserAuthenticatorProviderConfig providerConfig = {
+    InboundUserAuthenticatorProviderConfig providerConfig = {
         tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET
     };
 
-    InboundAzureAdUserAuthenticatorProvider inboundAzureAdUserAuthenticatorProvider = new(providerConfig);
+    InboundUserAuthenticatorProvider inboundAzureAdUserAuthenticatorProvider = new(providerConfig);
     http:BasicAuthHandler basicAuthHandler = new(inboundAzureAdUserAuthenticatorProvider);
     return basicAuthHandler;
 }

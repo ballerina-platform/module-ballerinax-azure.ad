@@ -24,7 +24,7 @@ import ballerina/lang.'string as sutils;
 # + clientId - Client ID for the client credentials grant authentication
 # + clientSecret - Client secret for the client credentials grant authentication
 # + scopes - Scope(s) of the access request
-public type InboundAzureAdUserAuthenticatorProviderConfig record {|
+public type InboundUserAuthenticatorProviderConfig record {|
     string tenantId;
     string clientId;
     string clientSecret?;
@@ -32,7 +32,7 @@ public type InboundAzureAdUserAuthenticatorProviderConfig record {|
 |};
 
 # An inbound authentication provider, which validates the used directory against the active one when the basic auth token is provided.
-public type InboundAzureAdUserAuthenticatorProvider object {
+public type InboundUserAuthenticatorProvider object {
 
     *auth:InboundAuthProvider;
 
@@ -48,7 +48,7 @@ public type InboundAzureAdUserAuthenticatorProvider object {
     # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not required
     # + scopes - Scope(s) of the access request
     # + 'resource - The resource, in which the authentication occurs
-    public function __init(InboundAzureAdUserAuthenticatorProviderConfig providerConfig) {
+    public function __init(InboundUserAuthenticatorProviderConfig providerConfig) {
         self.tenantId = providerConfig.tenantId;
         self.clientId = providerConfig.clientId;
         self.clientSecret = providerConfig?.clientSecret;
@@ -87,7 +87,7 @@ public type InboundAzureAdUserAuthenticatorProvider object {
             passwordGrantConfig.clientSecret = clientSecret;
         }
 
-        http:BearerAuthHandler bearerAuthHandler = getAzureAdOutboundOAuth2BearerHandler(passwordGrantConfig);
+        http:BearerAuthHandler bearerAuthHandler = getOutboundOAuth2BearerHandler(passwordGrantConfig);
         auth:OutboundAuthProvider provider = <auth:OutboundAuthProvider>bearerAuthHandler.authProvider;
 
         // Set the `AuthenticationContext`.
