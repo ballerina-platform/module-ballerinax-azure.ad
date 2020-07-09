@@ -5,9 +5,9 @@ Client Connector for Azure Active Directory
 Azure AD Client Connector allows you to perform operations on Users and Group of an Azure AD. The operations performed using the v1.0 version of Microsoft Graph API. The client uses OAuth 2.0 authentication.
 
 ## Compatibility
-|                     |    Version     |
-|:-------------------:|:--------------:|
-| Ballerina Language  | 1.2.x          |
+|                     |       Version      |
+|:-------------------:|:------------------:|
+| Ballerina Language  | Swan Lake Preview1 |
 
 ## Sample
 
