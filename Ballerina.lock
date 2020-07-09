@@ -128,16 +128,6 @@ org_name = "ballerina"
 name = "java"
 version = "0.9.0"
 
-[[imports."ballerinax/pol:0.1.0"]]
-org_name = "ballerina"
-name = "io"
-version = "0.5.0"
-
-[[imports."ballerinax/pol:0.1.0"]]
-org_name = "ballerinax"
-name = "azure.ad"
-version = "0.1.0"
-
 [[imports."ballerina/lang.array:1.1.0"]]
 org_name = "ballerina"
 name = "lang.__internal"
@@ -193,11 +183,6 @@ org_name = "ballerina"
 name = "java"
 version = "0.9.0"
 
-[[imports."ballerina/io:0.5.0"]]
-org_name = "ballerina"
-name = "java"
-version = "0.9.0"
-
 [[imports."ballerina/auth:1.0.0"]]
 org_name = "ballerina"
 name = "log"
@@ -237,6 +222,11 @@ version = "1.1.0"
 org_name = "ballerina"
 name = "lang.string"
 version = "1.1.0"
+
+[[imports."ballerina/io:0.5.0"]]
+org_name = "ballerina"
+name = "java"
+version = "0.9.0"
 
 [[imports."ballerina/mime:1.0.0"]]
 org_name = "ballerina"

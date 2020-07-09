@@ -55,9 +55,21 @@ The module provides an Inbound AuthHandler, which can be plugged to any `http:Li
 
 The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
+public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
+    ad:InboundUserAuthenticatorProviderConfig providerConfig = {
+        tenantId: "",
+        clientId: "",
+        clientSecret: ""
+    };
+
+    ad:InboundUserAuthenticatorProvider inboundAzureAdUserAuthenticatorProvider = new(providerConfig);
+    http:BasicAuthHandler basicAuthHandler = new(inboundAzureAdUserAuthenticatorProvider);
+    return basicAuthHandler;
+}
+
 public listener http:Listener myEP = new(9090, {
     auth: {
-        authHandlers: [ad:getAzureAdInboundBasicAuthHandler("", "", "")]
+        authHandlers: [getAzureAdInboundBasicAuthHandler()]
     },
     secureSocket: {
         keyStore: {
