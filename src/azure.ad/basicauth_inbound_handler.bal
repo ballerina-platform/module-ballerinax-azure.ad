@@ -88,11 +88,11 @@ public type InboundUserAuthenticatorProvider object {
             passwordGrantConfig.clientSecret = clientSecret;
         }
 
-        oauth2:OutboundOAuth2Provider oAuthProvider = getOutboundOAuth2Provider(passwordGrantConfig);
-        http:BearerAuthHandler bearerAuthHandler = new(oAuthProvider);
+        oauth2:OutboundOAuth2Provider oauthProvider = getOutboundOAuth2Provider(passwordGrantConfig);
+        http:BearerAuthHandler bearerAuthHandler = new(oauthProvider);
 
         // Set the `AuthenticationContext`.
-        string accessToken = check oAuthProvider.generateToken();
+        string accessToken = check oauthProvider.generateToken();
         auth:setAuthenticationContext("oauth2", accessToken);
 
         // Set the `Principal`.
