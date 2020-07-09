@@ -1,0 +1,9 @@
+tenantId = ""
+clientId = ""
+clientSecret = ""
+tenantDomain = ""
+
+[ad.users]
+[ad.users.user1]
+username = ""
+password = ""
