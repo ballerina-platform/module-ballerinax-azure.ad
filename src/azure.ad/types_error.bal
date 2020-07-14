@@ -14,10 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-public type AdClientError error;
-public type InvalidPayloadError error;
-public type GraphAPIError error<GraphAPIErrorDetails>;
-
 # Represents an error information returned from the Graph API.
 # 
 # + code - The error code from the Graph API
@@ -26,3 +22,7 @@ public type GraphAPIErrorDetails record {|
     string code;
     map<anydata> details;
 |};
+
+public type AdClientError distinct error;
+public type InvalidPayloadError distinct error;
+public type GraphAPIError distinct error<GraphAPIErrorDetails>;

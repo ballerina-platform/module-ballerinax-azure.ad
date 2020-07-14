@@ -530,7 +530,8 @@ public type Client client object {
         }
 
         json deleteErrorJson = <json>deleteErrorJsonOrError;
-        return parseError(deleteErrorJson);
+        GraphAPIError|InvalidPayloadError graphAPIError = parseError(deleteErrorJson);
+        return AdClientError("error occurred deleting group", graphAPIError);
     }
 
     # Add a member to a group
