@@ -84,8 +84,13 @@ function createUserWithInvalidFieldsTest() {
 
     User|AdClientError createdUser = adClient->createUser(newUser);
     if (createdUser is AdClientError) {
-        test:assertEquals(createdUser.reason(), "Request_BadRequest");
-        test:assertEquals(createdUser.detail()?.message, "One or more property values specified are invalid.");
+        error? adError = createdUser.cause();
+        if (adError is GraphAPIError) {
+            test:assertEquals(adError.message(), "One or more property values specified are invalid.");
+            test:assertEquals(adError.detail()["code"], "Request_BadRequest");
+        } else {
+            test:assertFail("Invalid error type found");
+        }
     } else {
         test:assertFail("User was not supposed to get created");
     }
@@ -144,10 +149,15 @@ function deleteNonExistingUser() {
     };
      AdClientError? deleteError = adClient->deleteUser(invalidUser);
      if (deleteError is AdClientError) {
-        test:assertEquals(deleteError.reason(), "Request_ResourceNotFound");
-        test:assertEquals(deleteError.detail()?.message, "Resource 'arnoldwesker@" + TENANT_DOMAIN + "' does not " + 
-                                                        "exist or one of its queried reference-property objects" +
-                                                        " are not present.");
+        error? adError = deleteError.cause();
+        if (adError is GraphAPIError) {
+            test:assertEquals(adError.message(), "Resource 'arnoldwesker@" + TENANT_DOMAIN + "' does not " + 
+                                                            "exist or one of its queried reference-property objects" +
+                                                            " are not present.");
+            test:assertEquals(adError.detail()["code"], "Request_ResourceNotFound");
+        } else {
+            test:assertFail("Invalid error type found");
+        }
     } else {
         test:assertFail("User was not supposed to get created");
     }

@@ -22,7 +22,13 @@ import ballerina/oauth2;
 # + oauth2Config - OAuth2 configuration for the client.
 # + return - Outbound auth handler.
 public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns http:BearerAuthHandler {
-    oauth2:OutboundOAuth2Provider oAuthProvider;
+    oauth2:OutboundOAuth2Provider oauthProvider = getOutboundOAuth2Provider(oauth2Config);
+    http:BearerAuthHandler bearerHandler = new(oauthProvider);
+    return bearerHandler;
+}
+
+function getOutboundOAuth2Provider(ClientCredentialsGrantConfig|PasswordGrantConfig|DirectTokenConfig oauth2Config) returns oauth2:OutboundOAuth2Provider {
+    oauth2:OutboundOAuth2Provider oauthProvider;
     // use OAuth2 instead of OAuth2
     if (oauth2Config is ClientCredentialsGrantConfig) {
         oauth2:ClientCredentialsGrantConfig clientCredentialConfig = {
@@ -40,7 +46,7 @@ public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|Pass
             clientCredentialConfig.scopes = scopes;
         }
 
-        oAuthProvider = new oauth2:OutboundOAuth2Provider(clientCredentialConfig);
+        oauthProvider = new oauth2:OutboundOAuth2Provider(clientCredentialConfig);
     } else if (oauth2Config is PasswordGrantConfig) {
         oauth2:PasswordGrantConfig passwordConfig = {
             tokenUrl: string `https://login.microsoftonline.com/${oauth2Config.tenantId}/oauth2/v2.0/token`,
@@ -69,7 +75,7 @@ public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|Pass
             passwordConfig.refreshConfig = oauth2RefreshConfig;
         }
 
-        oAuthProvider = new oauth2:OutboundOAuth2Provider(passwordConfig);
+        oauthProvider = new oauth2:OutboundOAuth2Provider(passwordConfig);
     } else {
         oauth2:DirectTokenConfig directTokenConfig = {
             clockSkewInSeconds: oauth2Config.clockSkewInSeconds,
@@ -101,9 +107,8 @@ public function getOutboundOAuth2BearerHandler(ClientCredentialsGrantConfig|Pass
             directTokenConfig.refreshConfig = oauth2DirectRefreshConfig;
         }
 
-        oAuthProvider = new oauth2:OutboundOAuth2Provider(directTokenConfig);
+        oauthProvider = new oauth2:OutboundOAuth2Provider(directTokenConfig);
     }
 
-    http:BearerAuthHandler bearerHandler = new(oAuthProvider);
-    return bearerHandler;
+    return oauthProvider;
 }

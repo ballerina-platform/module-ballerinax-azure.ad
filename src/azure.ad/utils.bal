@@ -15,38 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-function parseError(json errorJsonPayload) returns AdClientError {
+type MapAnydata map<anydata>;
+
+function parseError(json errorJsonPayload) returns GraphAPIError|InvalidPayloadError {
     json|error errorJsonOrError = errorJsonPayload.'error;
 
     if (errorJsonOrError is error) {
-        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to parse json error payload: " + errorJsonPayload.toJsonString());
-        return adClientError;
+        return InvalidPayloadError("unable to parse json error payload: " + errorJsonPayload.toJsonString());
     }
 
     json errorJson = <json>errorJsonOrError;
     json|error codeJsonOrError = errorJson.code;
     if (codeJsonOrError is error) {
-        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to find error code: " + errorJsonPayload.toJsonString());
-        return adClientError;
+        return InvalidPayloadError("unable to find error code: " + errorJsonPayload.toJsonString());
     }
     json codeJson  = <json>codeJsonOrError;
 
     json|error messageJsonOrError = errorJson.message;
     if (messageJsonOrError is error) {
-        AdClientError adClientError = error(AD_CLIENT_ERROR, message = "unable to find error message: " + errorJsonPayload.toJsonString());
-        return adClientError;
+        return InvalidPayloadError("unable to find error message: " + errorJsonPayload.toJsonString());
     }
     json messageJson = <json>messageJsonOrError;
 
     map<anydata> details = {};
     json|error detailsJsonOrError = errorJson.innerError;
     if (detailsJsonOrError is json) {
-        map<anydata>|error detailsMapOrError = map<anydata>.constructFrom(detailsJsonOrError);
+        map<anydata>|error detailsMapOrError = detailsJsonOrError.cloneWithType(MapAnydata);
         if (detailsMapOrError is map<anydata>) {
             details = detailsMapOrError;
         }
     }
     
-    AdClientError generalError = error(codeJson.toString(), message = messageJson.toString(), details = details);
-    return generalError;
+    return GraphAPIError(messageJson.toString(), code = codeJson.toString(), details = details);
 }

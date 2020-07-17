@@ -17,6 +17,7 @@
 import ballerina/auth;
 import ballerina/http;
 import ballerina/lang.'string as sutils;
+import ballerina/oauth2;
 
 # Configuration for an Azure active directory authenticator provider
 # 
@@ -48,7 +49,7 @@ public type InboundUserAuthenticatorProvider object {
     # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not required
     # + scopes - Scope(s) of the access request
     # + 'resource - The resource, in which the authentication occurs
-    public function __init(InboundUserAuthenticatorProviderConfig providerConfig) {
+    public function init(InboundUserAuthenticatorProviderConfig providerConfig) {
         self.tenantId = providerConfig.tenantId;
         self.clientId = providerConfig.clientId;
         self.clientSecret = providerConfig?.clientSecret;
@@ -59,7 +60,7 @@ public type InboundUserAuthenticatorProvider object {
     # 
     # + credential - The user's basic auth token
     # + return - `true` if authenticated, `false` if not authenticated, `error` if an error occurred while authenticating
-    public function authenticate(string credential) returns boolean|auth:Error {
+    public function authenticate(string credential) returns @tainted boolean|auth:Error {
         if (credential == "") {
             return false;
         }
@@ -87,11 +88,11 @@ public type InboundUserAuthenticatorProvider object {
             passwordGrantConfig.clientSecret = clientSecret;
         }
 
-        http:BearerAuthHandler bearerAuthHandler = getOutboundOAuth2BearerHandler(passwordGrantConfig);
-        auth:OutboundAuthProvider provider = <auth:OutboundAuthProvider>bearerAuthHandler.authProvider;
+        oauth2:OutboundOAuth2Provider oauthProvider = getOutboundOAuth2Provider(passwordGrantConfig);
+        http:BearerAuthHandler bearerAuthHandler = new(oauthProvider);
 
         // Set the `AuthenticationContext`.
-        string accessToken = check provider.generateToken();
+        string accessToken = check oauthProvider.generateToken();
         auth:setAuthenticationContext("oauth2", accessToken);
 
         // Set the `Principal`.

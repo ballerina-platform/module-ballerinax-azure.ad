@@ -3,9 +3,9 @@
 Azure AD Client Connector allows you to perform operations on users and groups of an Azure AD. The operations are performed using the v1.0 version of Microsoft Graph API. The client uses OAuth 2.0 authentication.
 
 ### Compatibility
-|                     |    Version     |
-|:-------------------:|:--------------:|
-| Ballerina Language  | 1.2.x          |
+|                     |       Version      |
+|:-------------------:|:------------------:|
+| Ballerina Language  | Swan Lake Preview1 |
 
 ### Sample
 
@@ -53,9 +53,21 @@ This module provides an Inbound AuthHandler, which can be plugged to any `http:L
 
 The Auth Handler can be retrieved by invoking the following function:
 ```ballerina
+public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
+    ad:InboundUserAuthenticatorProviderConfig providerConfig = {
+        tenantId: "",
+        clientId: "",
+        clientSecret: ""
+    };
+
+    ad:InboundUserAuthenticatorProvider inboundAzureAdUserAuthenticatorProvider = new(providerConfig);
+    http:BasicAuthHandler basicAuthHandler = new(inboundAzureAdUserAuthenticatorProvider);
+    return basicAuthHandler;
+}
+
 public listener http:Listener myEP = new(9090, {
     auth: {
-        authHandlers: [ad:getAzureAdInboundBasicAuthHandler("", "", "")]
+        authHandlers: [getAzureAdInboundBasicAuthHandler()]
     },
     secureSocket: {
         keyStore: {
