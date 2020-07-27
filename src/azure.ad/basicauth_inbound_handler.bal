@@ -93,14 +93,13 @@ public type InboundUserAuthenticatorProvider object {
 
         // Set the `AuthenticationContext`.
         string accessToken = check oauthProvider.generateToken();
-        auth:setAuthenticationContext("oauth2", accessToken);
 
         // Set the `Principal`.
         if (oAuthScopes is string) {
             string[] oAuthScopeArray = [oAuthScopes];
-            auth:setPrincipal(username, username, oAuthScopeArray);
+            auth:setInvocationContext("oauth2", accessToken, username, oAuthScopeArray);
         } else {
-            auth:setPrincipal(username, username, oAuthScopes);
+            auth:setInvocationContext("oauth2", accessToken, username, oAuthScopes);
         }
 
         return true;
