@@ -7,3 +7,7 @@ tenantDomain = ""
 [ad.users.user1]
 username = ""
 password = ""
+
+[ad.users.user2]
+username = ""
+password = ""

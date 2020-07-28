@@ -39,8 +39,8 @@ public function passwordGrantClientTest() {
         tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
-        username: config:getAsString("ad.users.user1.username"),
-        password: config:getAsString("ad.users.user1.password")
+        username: config:getAsString("ad.users.user2.username"),
+        password: config:getAsString("ad.users.user2.password")
     };
 
     ClientConfiguration clientConfig = {

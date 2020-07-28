@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/auth;
 import ballerina/config;
 import ballerina/test;
 import ballerina/http;
 import ballerina/log;
-import ballerina/runtime;
 
 
 public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
@@ -54,12 +54,9 @@ service {
         path: "/cart"
     }
     resource function getCart(http:Caller caller, http:Request req) {
-        runtime:AuthenticationContext? authContext = runtime:getInvocationContext()?.authenticationContext;
-        string? authScheme = authContext?.scheme;
-        test:assertEquals(authScheme, "oauth2");
-
-        runtime:Principal? principal = runtime:getInvocationContext()?.principal;
-        test:assertEquals(principal?.username, config:getAsString("ad.users.user1.username"));
+        auth:InvocationContext authContext = auth:getInvocationContext();
+        test:assertEquals(authContext?.scheme, "oauth2");
+        test:assertEquals(authContext?.userId, config:getAsString("ad.users.user1.username"));
         
         json cart = {
             items: [{

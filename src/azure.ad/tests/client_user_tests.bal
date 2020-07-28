@@ -14,11 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
+import ballerina/config;
 import ballerina/test;
 
 User? testUser1 = ();
 User? testUser2 = ();
+User? testUser3 = ();
 
 @test:BeforeSuite
 function createUserTest() {
@@ -53,6 +54,18 @@ function createUserTest() {
         ...additionalUser2Attributes
     };
 
+    NewUser newUser3 = {
+        accountEnabled: true,
+        displayName: "Foo Bar",
+        mailNickname: "foobar",
+        passwordProfile: {
+            forceChangePasswordNextSignIn: false,
+            password: config:getAsString("ad.users.user1.password")
+        },
+        userPrincipalName: config:getAsString("ad.users.user1.username"),
+        ...additionalUser2Attributes
+    };
+
     User createdUser = checkpanic adClient->createUser(newUser1);
     test:assertEquals(createdUser.displayName, "Garfield Lynns");
     test:assertEquals(createdUser["jobTitle"], "DevOps Engineer");
@@ -64,6 +77,9 @@ function createUserTest() {
     test:assertEquals(createdUser["jobTitle"], "Software Quality Manager");
 
     testUser2 = <@untainted>createdUser;
+
+    createdUser = checkpanic adClient->createUser(newUser3);
+    testUser3 = <@untainted>createdUser;
 }
 
 @test:Config {}
@@ -177,5 +193,12 @@ function deleteTestUsersTest()  {
         checkpanic adClient->deleteUser(createdUser2);
     } else {
         test:assertFail("Test user2 was not created");
+    }
+
+    User? createdUser3 = testUser3;
+    if (createdUser3 is User) {
+        checkpanic adClient->deleteUser(createdUser3);
+    } else {
+        test:assertFail("Test user3 was not created");
     }
 }

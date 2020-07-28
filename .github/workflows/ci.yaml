@@ -13,4 +13,4 @@ jobs:
         uses: ballerina-platform/ballerina-action/@swan-lake-release
         with:
           args:
-            build -c --skip-tests azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
+            build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
