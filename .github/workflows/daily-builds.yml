@@ -1,0 +1,25 @@
+name: Daily build
+
+on:
+  schedule:
+    - cron:  '0 */12 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Ballerina Build
+        uses: ballerina-platform/ballerina-action/@swan-lake-release
+        with:
+          env: 
+            tenantId = ${{ secrets.tenantId }}
+            clientId = ${{ secrets.clientId }}
+            clientSecret = ${{ secrets.clientSecret }}
+            tenantDomain = ${{ secrets.tenantDomain }}
+            ad_users_user1_username = ${{ secrets.ad_users_user1_username }}
+            ad_users_user1_password = ${{ secrets.ad_users_user1_password }}
+            ad_users_user2_username = ${{ secrets.ad_users_user2_username }}
+            ad_users_user2_password = ${{ secrets.ad_users_user2_password }}
+          args:
+            build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
