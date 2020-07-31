@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/config;
+import ballerina/system;
 
 final string TENANT_ID = getConfigValue("TENANTID");
 final string CLIENT_ID = getConfigValue("CLIENTID");
