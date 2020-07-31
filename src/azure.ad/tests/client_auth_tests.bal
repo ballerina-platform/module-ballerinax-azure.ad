@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/config;
 import ballerina/test;
 
 @test:Config {}
@@ -39,8 +38,8 @@ public function passwordGrantClientTest() {
         tenantId: TENANT_ID,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
-        username: config:getAsString("ad.users.user2.username"),
-        password: config:getAsString("ad.users.user2.password")
+        username: getConfigValue("AD_USERS_USER2_USERNAME"),
+        password: getConfigValue("AD_USERS_USER2_PASSWORD")
     };
 
     ClientConfiguration clientConfig = {

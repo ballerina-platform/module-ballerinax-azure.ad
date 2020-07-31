@@ -1,13 +1,10 @@
-tenantId = ""
-clientId = ""
-clientSecret = ""
-tenantDomain = ""
+TENANTID = ""
+CLIENTID = ""
+CLIENTSECRET = ""
+TENANTDOMAIN = ""
 
-[ad.users]
-[ad.users.user1]
-username = ""
-password = ""
+AD_USERS_USER1_USERNAME = ""
+AD_USERS_USER1_PASSWORD = ""
 
-[ad.users.user2]
-username = ""
-password = ""
+AD_USERS_USER2_USERNAME = ""
+AD_USERS_USER2_PASSWORD = ""

@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/config;
 import ballerina/test;
 
 User? testUser1 = ();
@@ -60,9 +59,9 @@ function createUserTest() {
         mailNickname: "foobar",
         passwordProfile: {
             forceChangePasswordNextSignIn: false,
-            password: config:getAsString("ad.users.user1.password")
+            password: getConfigValue("AD_USERS_USER1_PASSWORD")
         },
-        userPrincipalName: config:getAsString("ad.users.user1.username"),
+        userPrincipalName: getConfigValue("AD_USERS_USER1_USERNAME"),
         ...additionalUser2Attributes
     };
 
