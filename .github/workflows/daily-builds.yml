@@ -12,14 +12,14 @@ jobs:
       - name: Ballerina Build
         uses: ballerina-platform/ballerina-action/@swan-lake-release
         with:
-          env: 
-            tenantId = ${{ secrets.TENANTID }}
-            clientId = ${{ secrets.CLIENTID }}
-            clientSecret = ${{ secrets.CLIENTSECRET }}
-            tenantDomain = ${{ secrets.TENANTDOMAIN }}
-            ad_users_user1_username = ${{ secrets.AD_USERS_USER1_USERNAME }}
-            ad_users_user1_password = ${{ secrets.AD_USERS_USER1_PASSWORD }}
-            ad_users_user2_username = ${{ secrets.AD_USERS_USER2_USERNAME }}
-            ad_users_user2_password = ${{ secrets.AD_USERS_USER2_PASSWORD }}
           args:
             build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
+        env:
+          tenantId: ${{ secrets.TENANTID }}
+          clientId: ${{ secrets.CLIENTID }}
+          clientSecret: ${{ secrets.CLIENTSECRET }}
+          tenantDomain: ${{ secrets.TENANTDOMAIN }}
+          ad_users_user1_username: ${{ secrets.AD_USERS_USER1_USERNAME }}
+          ad_users_user1_password: ${{ secrets.AD_USERS_USER1_PASSWORD }}
+          ad_users_user2_username: ${{ secrets.AD_USERS_USER2_USERNAME }}
+          ad_users_user2_password: ${{ secrets.AD_USERS_USER2_PASSWORD }}
