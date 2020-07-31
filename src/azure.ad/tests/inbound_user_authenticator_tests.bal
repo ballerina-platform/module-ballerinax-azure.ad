@@ -56,7 +56,7 @@ service {
     resource function getCart(http:Caller caller, http:Request req) {
         auth:InvocationContext authContext = auth:getInvocationContext();
         test:assertEquals(authContext?.scheme, "oauth2");
-        test:assertEquals(authContext?.userId, config:getAsString("ad.users.user1.username"));
+        test:assertEquals(authContext?.userId, getConfigValue("AD_USERS_USER1_USERNAME"));
         
         json cart = {
             items: [{
@@ -95,8 +95,8 @@ public function basicAuthInboundHandlerTest() {
                 }
             });
             http:Request getCarRequest = new;
-            string username = config:getAsString("ad.users.user1.username");
-            string password = config:getAsString("ad.users.user1.password");
+            string username = getConfigValue("AD_USERS_USER1_USERNAME");
+            string password = getConfigValue("AD_USERS_USER1_PASSWORD");
             getCarRequest.setHeader("Authorization", "Basic " + checkpanic getBasicAuthToken(username, password));
             http:Response cartResponse = checkpanic customerClient->get("/shop/cart", getCarRequest);
             json cartJson = checkpanic cartResponse.getJsonPayload();

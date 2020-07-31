@@ -60,9 +60,9 @@ function createUserTest() {
         mailNickname: "foobar",
         passwordProfile: {
             forceChangePasswordNextSignIn: false,
-            password: config:getAsString("ad.users.user1.password")
+            password: getConfigValue("AD_USERS_USER1_PASSWORD")
         },
-        userPrincipalName: config:getAsString("ad.users.user1.username"),
+        userPrincipalName: getConfigValue("AD_USERS_USER1_USERNAME"),
         ...additionalUser2Attributes
     };
 

@@ -16,10 +16,10 @@
 
 import ballerina/config;
 
-final string TENANT_ID = config:getAsString("tenantId");
-final string CLIENT_ID = config:getAsString("clientId");
-final string CLIENT_SECRET = config:getAsString("clientSecret");
-final string TENANT_DOMAIN = config:getAsString("tenantDomain");
+final string TENANT_ID = getConfigValue("TENANTID");
+final string CLIENT_ID = getConfigValue("CLIENTID");
+final string CLIENT_SECRET = getConfigValue("CLIENTSECRET");
+final string TENANT_DOMAIN = getConfigValue("TENANTDOMAIN");
 
 Client adClient = getClient();
 
@@ -36,4 +36,8 @@ public function getClient() returns Client {
 
     Client adClient = new(clientConfig);
     return adClient;
+}
+
+function getConfigValue(string key) returns string {
+    return (system:getEnv(key) != "") ? system:getEnv(key) : config:getAsString(key);
 }
