@@ -11,15 +11,14 @@ jobs:
       - uses: actions/checkout@v2
       - name: Ballerina Build
         uses: ballerina-platform/ballerina-action/@swan-lake-release
-        with:
-          env: 
-            TENANTID = ${{ secrets.TENANTID }}
-            CLIENTID = ${{ secrets.CLIENTID }}
-            CLIENTSECRET = ${{ secrets.CLIENTSECRET }}
-            TENANTDOMAIN = ${{ secrets.TENANTDOMAIN }}
-            AD_USERS_USER1_USERNAME = ${{ secrets.AD_USERS_USER1_USERNAME }}
-            AD_USERS_USER1_PASSWORD = ${{ secrets.AD_USERS_USER1_PASSWORD }}
-            AD_USERS_USER2_USERNAME = ${{ secrets.AD_USERS_USER2_USERNAME }}
-            AD_USERS_USER2_PASSWORD = ${{ secrets.AD_USERS_USER2_PASSWORD }}
+        env:
+          TENANTID = ${{ secrets.TENANTID }}
+          CLIENTID = ${{ secrets.CLIENTID }}
+          CLIENTSECRET = ${{ secrets.CLIENTSECRET }}
+          TENANTDOMAIN = ${{ secrets.TENANTDOMAIN }}
+          AD_USERS_USER1_USERNAME = ${{ secrets.AD_USERS_USER1_USERNAME }}
+          AD_USERS_USER1_PASSWORD = ${{ secrets.AD_USERS_USER1_PASSWORD }}
+          AD_USERS_USER2_USERNAME = ${{ secrets.AD_USERS_USER2_USERNAME }}
+          AD_USERS_USER2_PASSWORD = ${{ secrets.AD_USERS_USER2_PASSWORD }}
           args:
             build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
