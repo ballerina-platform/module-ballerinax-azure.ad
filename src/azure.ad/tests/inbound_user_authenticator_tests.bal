@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/auth;
-import ballerina/config;
 import ballerina/test;
 import ballerina/http;
 import ballerina/log;
