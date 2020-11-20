@@ -120,7 +120,7 @@ function groupOwnerTest() {
     }
 }
 
-@test:AfterSuite
+@test:AfterSuite {}
 function deleteGroupTest() {
     Group? groupToDelete1 = testGroup1;
     if (groupToDelete1 is Group) {
