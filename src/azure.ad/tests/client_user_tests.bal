@@ -23,7 +23,7 @@ User? testUser3 = ();
 
 @test:BeforeSuite
 function createUserTest() {
-    record { string jobTitle; string postalCode; } additionalUser1Attributes = { 
+    record {| string jobTitle; string postalCode; |} additionalUser1Attributes = {
         jobTitle: "DevOps Engineer",
         postalCode: "10100"
     };
@@ -40,7 +40,7 @@ function createUserTest() {
         ...additionalUser1Attributes
     };
 
-    record { string jobTitle; } additionalUser2Attributes = { jobTitle: "Software Quality Manager" };
+    record {| string jobTitle; |} additionalUser2Attributes = { jobTitle: "Software Quality Manager" };
 
     NewUser newUser2 = {
         accountEnabled: true,
@@ -84,7 +84,7 @@ function createUserTest() {
 
 @test:Config {}
 function createUserWithInvalidFieldsTest() {
-    record { string middleName; } additionalAttributes = { middleName: "Tikka" };
+    record {| string middleName; |} additionalAttributes = { middleName: "Tikka" };
 
     NewUser newUser = {
         accountEnabled: true,
@@ -179,7 +179,7 @@ function deleteNonExistingUser() {
     }
 }
 
-@test:AfterSuite
+@test:AfterSuite {}
 function deleteTestUsersTest()  {
     User? createdUser1 = testUser1;
     if (createdUser1 is User) {

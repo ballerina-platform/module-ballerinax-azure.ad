@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/oauth2;
 
 # The data structure, which is used to configure the OAuth2 client credentials grant type.
 #
@@ -34,7 +35,7 @@ public type ClientCredentialsGrantConfig record {|
     int clockSkewInSeconds = 0;
     boolean retryRequest = true;
     http:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
-    http:ClientConfiguration clientConfig = {};
+    oauth2:ClientConfiguration clientConfig = {};
 |};
 
 # The data structure, which is used to configure the OAuth2 password grant type.
@@ -61,7 +62,7 @@ public type PasswordGrantConfig record {|
     int clockSkewInSeconds = 0;
     boolean retryRequest = true;
     http:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
-    http:ClientConfiguration clientConfig = {};
+    oauth2:ClientConfiguration clientConfig = {};
 |};
 
 # The data structure, which is used to configure the OAuth2 access token directly.
@@ -78,7 +79,7 @@ public type DirectTokenConfig record {|
     DirectTokenRefreshConfig refreshConfig?;
     int clockSkewInSeconds = 0;
     boolean retryRequest = true;
-    http:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
+    oauth2:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
 |};
 
 # The data structure, which can be used to pass the configurations for refreshing the access token of
@@ -90,7 +91,7 @@ public type DirectTokenConfig record {|
 public type RefreshConfig record {|
     string[] scopes?;
     http:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
-    http:ClientConfiguration clientConfig = {};
+    oauth2:ClientConfiguration clientConfig = {};
 |};
 
 # The data structure, which can be used to pass the configurations for refreshing the access token directly.
@@ -107,5 +108,5 @@ public type DirectTokenRefreshConfig record {|
     string clientSecret;
     string[] scopes = ["https://graph.microsoft.com/.default"];
     http:CredentialBearer credentialBearer = http:AUTH_HEADER_BEARER;
-    http:ClientConfiguration clientConfig = {};
+    oauth2:ClientConfiguration clientConfig = {};
 |};
