@@ -27,7 +27,7 @@ public type ClientConfiguration record {|
 |};
 
 # Azure Active Directory Client
-public type Client client object {
+public client class Client {
     private ClientConfiguration config;
     private http:Client graphClient;
 
@@ -49,7 +49,7 @@ public type Client client object {
     # + return - Newly created User or error when creating it
     public remote function createUser(NewUser newUser) returns @tainted User|AdClientError {
         json newUserJson = checkpanic newUser.cloneWithType(json);
-        http:Response|error newUserResponseOrError = self.graphClient->post("/users/", newUserJson);
+        var newUserResponseOrError = self.graphClient->post("/users/", newUserJson);
         if newUserResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", newUserResponseOrError);
         }
@@ -81,8 +81,8 @@ public type Client client object {
     # + top - Maximum number of users to return
     # + filter - Filter users based on odata filtering
     # + return - The users or error when retrieving users
-    public remote function getUsers(public int top = 100, public string filter = "") returns @tainted User[]|AdClientError {
-        http:Response|error getUsersResponseOrError = self.graphClient->get(string `/users?$top=${top}&$filter=${filter}`);
+    public remote function getUsers(int top = 100, string filter = "") returns @tainted User[]|AdClientError {
+        var getUsersResponseOrError = self.graphClient->get(string `/users?$top=${top}&$filter=${filter}`);
         if getUsersResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getUsersResponseOrError);
         }
@@ -120,8 +120,8 @@ public type Client client object {
     # + userID - User ID or User Principal Name of the user
     # + additionalFields - Additional fields to select from the user
     # + return - The user or error when retrieving the user
-    public remote function getUser(string userID, public string[] additionalFields = []) returns @tainted User|AdClientError {
-        http:Response|error getUserResponseOrError = self.graphClient->get(string `/users/${userID}`);
+    public remote function getUser(string userID, string[] additionalFields = []) returns @tainted User|AdClientError {
+        var getUserResponseOrError = self.graphClient->get(string `/users/${userID}`);
         if getUserResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getUserResponseOrError);
         }
@@ -143,7 +143,7 @@ public type Client client object {
         if (additionalFields != []) {
             string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/users/${userID}?$select=${selectFields}`);
+            var getUserSelectResponseOrError = self.graphClient->get(string `/users/${userID}?$select=${selectFields}`);
             if getUserSelectResponseOrError is error {
                 return AdClientError("unable to connect to azure active directory", getUserSelectResponseOrError);
             }
@@ -178,8 +178,8 @@ public type Client client object {
     # 
     # + additionalFields - Additional fields to retrieve
     # + return - The current user or error when retrieve
-    public remote function getCurrentUser(public string[] additionalFields = []) returns @tainted User|AdClientError {
-        http:Response|error getUserResponseOrError = self.graphClient->get("/me");
+    public remote function getCurrentUser(string[] additionalFields = []) returns @tainted User|AdClientError {
+        var getUserResponseOrError = self.graphClient->get("/me");
         if getUserResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getUserResponseOrError);
         }
@@ -201,7 +201,7 @@ public type Client client object {
         if (additionalFields != []) {
             string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getUserSelectResponseOrError = self.graphClient->get(string `/me?$select=${selectFields}`);
+            var getUserSelectResponseOrError = self.graphClient->get(string `/me?$select=${selectFields}`);
             if getUserSelectResponseOrError is error {
                 return AdClientError("unable to connect to azure active directory", getUserSelectResponseOrError);
             }
@@ -241,7 +241,7 @@ public type Client client object {
         json managerIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/users/${manager.id}`
         };
-        http:Response|error assignManagerResponseOrError = self.graphClient->put(string `/users/${user.id}/manager/$ref`, managerIDJson);
+        var assignManagerResponseOrError = self.graphClient->put(string `/users/${user.id}/manager/$ref`, managerIDJson);
 
         if assignManagerResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", assignManagerResponseOrError);
@@ -268,7 +268,7 @@ public type Client client object {
     # + user - The user
     # + return - The manager or error when retrieve
     public remote function getManagerOfUser(User user) returns @tainted User|AdClientError {
-        http:Response|error getManagerResponseOrError = self.graphClient->get(string `/users/${user.userPrincipalName}/manager`);
+        var getManagerResponseOrError = self.graphClient->get(string `/users/${user.userPrincipalName}/manager`);
         if getManagerResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getManagerResponseOrError);
         }
@@ -301,7 +301,7 @@ public type Client client object {
     # + return - Error if occurred when retrieving
     public remote function updateUser(User user) returns @tainted AdClientError? {
         json userJson = checkpanic user.cloneWithType(json);
-        http:Response|error udpateUserResponseOrError = self.graphClient->patch(string `/users/${user.userPrincipalName}`, userJson);
+        var udpateUserResponseOrError = self.graphClient->patch(string `/users/${user.userPrincipalName}`, userJson);
         if udpateUserResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", udpateUserResponseOrError);
         }
@@ -327,7 +327,7 @@ public type Client client object {
     # + user - The user
     # + return - Error if occurred when retrieving
     public remote function deleteUser(User user) returns @tainted AdClientError? {
-        http:Response|error deleteUserResponseOrError = self.graphClient->delete(string `/users/${user.userPrincipalName}`);
+        var deleteUserResponseOrError = self.graphClient->delete(string `/users/${user.userPrincipalName}`);
 
         if deleteUserResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", deleteUserResponseOrError);
@@ -355,7 +355,7 @@ public type Client client object {
     # + return - The group or error when retrieving
     public remote function createGroup(NewGroup newGroup) returns @tainted Group|AdClientError {
         json newGroupJson = checkpanic newGroup.cloneWithType(json);
-        http:Response|error newGroupResponseOrError = self.graphClient->post("/groups/", newGroupJson);
+        var newGroupResponseOrError = self.graphClient->post("/groups/", newGroupJson);
         if newGroupResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", newGroupResponseOrError);
         }
@@ -387,8 +387,8 @@ public type Client client object {
     # + top - Number of results
     # + filter - OData filtering
     # + return - Groups or error when retrieving
-    public remote function getGroups(public int top = 100, public string filter = "") returns @tainted Group[]|AdClientError {
-        http:Response|error getGroupsResponseOrError = self.graphClient->get(string `/groups?$top=${top}&$filter=${filter}`);
+    public remote function getGroups(int top = 100, string filter = "") returns @tainted Group[]|AdClientError {
+        var getGroupsResponseOrError = self.graphClient->get(string `/groups?$top=${top}&$filter=${filter}`);
         if getGroupsResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getGroupsResponseOrError);
         }
@@ -426,8 +426,8 @@ public type Client client object {
     # + groupID - The group ID
     # + additionalFields - Additional fields to select
     # + return - The group or error when retrieving
-    public remote function getGroup(string groupID, public string[] additionalFields = []) returns @tainted Group|AdClientError {
-        http:Response|error getGroupResponseOrError = self.graphClient->get(string `/groups/${groupID}`);
+    public remote function getGroup(string groupID, string[] additionalFields = []) returns @tainted Group|AdClientError {
+        var getGroupResponseOrError = self.graphClient->get(string `/groups/${groupID}`);
         if getGroupResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getGroupResponseOrError);
         }
@@ -449,7 +449,7 @@ public type Client client object {
         if (additionalFields != []) {
             string selectFields = sutils:'join(",", ...additionalFields);
 
-            http:Response|error getGroupSelectResponseOrError = self.graphClient->get(string `/groups/${groupID}?$select=${selectFields}`);
+            var getGroupSelectResponseOrError = self.graphClient->get(string `/groups/${groupID}?$select=${selectFields}`);
             if getGroupSelectResponseOrError is error {
                 return AdClientError("unable to connect to azure active directory", getGroupSelectResponseOrError);
             }
@@ -486,7 +486,7 @@ public type Client client object {
     # + return - Error if occurred when retrieving
     public remote function updateGroup(Group group) returns @tainted AdClientError? {
         json groupJson = checkpanic group.cloneWithType(json);
-        http:Response|error udpateGroupResponseOrError = self.graphClient->patch(string `/groups/${group.id}`, groupJson);
+        var udpateGroupResponseOrError = self.graphClient->patch(string `/groups/${group.id}`, groupJson);
         if udpateGroupResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", udpateGroupResponseOrError);
         }
@@ -512,7 +512,7 @@ public type Client client object {
     # + group - Group to delete
     # + return - Error if occurred when retrieving
     public remote function deleteGroup(Group group) returns @tainted AdClientError? {
-        http:Response|error deleteGroupResponseOrError = self.graphClient->delete(string `/groups/${group.id}`);
+        var deleteGroupResponseOrError = self.graphClient->delete(string `/groups/${group.id}`);
 
         if deleteGroupResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", deleteGroupResponseOrError);
@@ -543,7 +543,7 @@ public type Client client object {
         json memberIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}`
         };
-        http:Response|error addMemberResponseOrError = self.graphClient->post(string `/groups/${group.id}/members/$ref`, memberIDJson);
+        var addMemberResponseOrError = self.graphClient->post(string `/groups/${group.id}/members/$ref`, memberIDJson);
 
         if addMemberResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", addMemberResponseOrError);
@@ -571,8 +571,8 @@ public type Client client object {
     # + top - The number of results
     # + filter - OData filtering
     # + return - The members of the group or error when retrieving
-    public remote function getGroupMembers(Group group, public int top = 100, public string filter = "") returns @tainted (User|Group|Device)[]|AdClientError {
-        http:Response|error getMembersResponseOrError = self.graphClient->get(string `/groups/${group.id}/members?$top=${top}&$filter=${filter}`);
+    public remote function getGroupMembers(Group group, int top = 100, string filter = "") returns @tainted (User|Group|Device)[]|AdClientError {
+        var getMembersResponseOrError = self.graphClient->get(string `/groups/${group.id}/members?$top=${top}&$filter=${filter}`);
         if getMembersResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getMembersResponseOrError);
         }
@@ -633,7 +633,7 @@ public type Client client object {
     # + member - The member to be removed
     # + return - Error if occurred
     public remote function removeMemberFromGroup(Group group, User|Group|Device member) returns @tainted AdClientError? {
-        http:Response|error removeMemberResponseOrError = self.graphClient->delete(string `/groups/${group.id}/members/${member.id}/$ref`);
+        var removeMemberResponseOrError = self.graphClient->delete(string `/groups/${group.id}/members/${member.id}/$ref`);
 
         if removeMemberResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", removeMemberResponseOrError);
@@ -664,7 +664,7 @@ public type Client client object {
         json ownerIDJson = {
             "@odata.id": string `https://graph.microsoft.com/v1.0/users/${owner.id}`
         };
-        http:Response|error addOwnerResponseOrError = self.graphClient->post(string `/groups/${group.id}/owners/$ref`, ownerIDJson);
+        var addOwnerResponseOrError = self.graphClient->post(string `/groups/${group.id}/owners/$ref`, ownerIDJson);
 
         if addOwnerResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", addOwnerResponseOrError);
@@ -692,8 +692,8 @@ public type Client client object {
     # + top - The number of owners
     # + filter - OData filtering
     # + return - The owners or error occurred when retrieving
-    public remote function getGroupOwners(Group group, public int top = 100, public string filter = "") returns @tainted User[]|AdClientError {
-        http:Response|error getOwnersResponseOrError = self.graphClient->get(string `/groups/${group.id}/owners?$top=${top}&$filter=${filter}`);
+    public remote function getGroupOwners(Group group, int top = 100, string filter = "") returns @tainted User[]|AdClientError {
+        var getOwnersResponseOrError = self.graphClient->get(string `/groups/${group.id}/owners?$top=${top}&$filter=${filter}`);
         if getOwnersResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", getOwnersResponseOrError);
         }
@@ -732,7 +732,7 @@ public type Client client object {
     # + owner - The owner to be removed
     # + return - Error if occurred when retrieving
     public remote function removeOwnerFromGroup(Group group, User owner) returns @tainted AdClientError? {
-        http:Response|error removeOwnerResponseOrError = self.graphClient->delete(string `/groups/${group.id}/owners/${owner.id}/$ref`);
+        var removeOwnerResponseOrError = self.graphClient->delete(string `/groups/${group.id}/owners/${owner.id}/$ref`);
 
         if removeOwnerResponseOrError is error {
             return AdClientError("unable to connect to azure active directory", removeOwnerResponseOrError);
@@ -753,4 +753,4 @@ public type Client client object {
         GraphAPIError|InvalidPayloadError graphAPIError = parseError(removeOwnerErrorJson);
         return AdClientError("error occurred deleting group owner", graphAPIError);
     }
-};
+}

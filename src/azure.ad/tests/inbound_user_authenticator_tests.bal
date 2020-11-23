@@ -21,7 +21,7 @@ import ballerina/http;
 import ballerina/log;
 
 
-public function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
+public isolated function getAzureAdInboundBasicAuthHandler() returns http:BasicAuthHandler {
     InboundUserAuthenticatorProviderConfig providerConfig = {
         tenantId: TENANT_ID,
         clientId: CLIENT_ID,
@@ -53,7 +53,7 @@ service {
         methods: ["GET"],
         path: "/cart"
     }
-    resource function getCart(http:Caller caller, http:Request req) {
+    resource isolated function getCart(http:Caller caller, http:Request req) {
         auth:InvocationContext authContext = auth:getInvocationContext();
         test:assertEquals(authContext?.scheme, "oauth2");
         test:assertEquals(authContext?.userId, config:getAsString("ad.users.user1.username"));
@@ -98,19 +98,21 @@ public function basicAuthInboundHandlerTest() {
             string username = config:getAsString("ad.users.user1.username");
             string password = config:getAsString("ad.users.user1.password");
             getCarRequest.setHeader("Authorization", "Basic " + checkpanic getBasicAuthToken(username, password));
-            http:Response cartResponse = checkpanic customerClient->get("/shop/cart", getCarRequest);
-            json cartJson = checkpanic cartResponse.getJsonPayload();
-            json[] items = <json[]>checkpanic cartJson.items;
-            test:assertEquals(items.length(), 2);
-            test:assertEquals(items[0].name, "eggs");
-            test:assertEquals(items[0].quantity, 10);
+            var cartResponse = checkpanic customerClient->get("/shop/cart", getCarRequest);
+            if (cartResponse is http:Response) {
+                json cartJson = checkpanic cartResponse.getJsonPayload();
+                json[] items = <json[]>checkpanic cartJson.items;
+                test:assertEquals(items.length(), 2);
+                test:assertEquals(items[0].name, "eggs");
+                test:assertEquals(items[0].quantity, 10);
+            }
             
             checkpanic shopEP.__gracefulStop();
         }
     }
 }
 
-function getBasicAuthToken(string username, string password) returns string|error {
+isolated function getBasicAuthToken(string username, string password) returns string|error {
     if (username == "" || password == "") {
         error authError = error("Username or password cannot be empty.");
         return authError;

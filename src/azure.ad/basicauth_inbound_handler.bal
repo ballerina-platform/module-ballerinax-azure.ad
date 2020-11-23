@@ -33,7 +33,7 @@ public type InboundUserAuthenticatorProviderConfig record {|
 |};
 
 # An inbound authentication provider, which validates the used directory against the active one when the basic auth token is provided.
-public type InboundUserAuthenticatorProvider object {
+public class InboundUserAuthenticatorProvider {
 
     *auth:InboundAuthProvider;
 
@@ -49,7 +49,7 @@ public type InboundUserAuthenticatorProvider object {
     # + clientSecret - Client secret for the client credentials grant authentication // TOOD: not required
     # + scopes - Scope(s) of the access request
     # + 'resource - The resource, in which the authentication occurs
-    public function init(InboundUserAuthenticatorProviderConfig providerConfig) {
+    public isolated function init(InboundUserAuthenticatorProviderConfig providerConfig) {
         self.tenantId = providerConfig.tenantId;
         self.clientId = providerConfig.clientId;
         self.clientSecret = providerConfig?.clientSecret;
@@ -104,4 +104,4 @@ public type InboundUserAuthenticatorProvider object {
 
         return true;
     }
-};
+}
