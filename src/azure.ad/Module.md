@@ -7,7 +7,7 @@ Azure AD Client Connector allows you to perform operations on Users and Group of
 ## Compatibility
 |                     |       Version       |
 |:-------------------:|:-------------------:|
-| Ballerina Language  | Swan Lake Preview 2 |
+| Ballerina Language  | Swan Lake Preview 5 |
 
 ## Sample
 

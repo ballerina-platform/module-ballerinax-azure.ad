@@ -17,7 +17,7 @@
 
 type MapAnydata map<anydata>;
 
-function parseError(json errorJsonPayload) returns GraphAPIError|InvalidPayloadError {
+isolated function parseError(json errorJsonPayload) returns GraphAPIError|InvalidPayloadError {
     json|error errorJsonOrError = errorJsonPayload.'error;
 
     if (errorJsonOrError is error) {

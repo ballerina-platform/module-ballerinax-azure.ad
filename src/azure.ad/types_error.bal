@@ -18,10 +18,10 @@
 # 
 # + code - The error code from the Graph API
 # + details - More details on the error from Graph API
-public type GraphAPIErrorDetails record {|
+public type GraphAPIErrorDetails record {
     string code;
     map<anydata> details;
-|};
+};
 
 public type AdClientError distinct error;
 public type InvalidPayloadError distinct error;
