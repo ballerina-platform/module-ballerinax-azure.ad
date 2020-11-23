@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Ballerina Build
-        uses: ballerina-platform/ballerina-action/@swan-lake-release
+        uses: ballerina-platform/ballerina-action/@release-2.0.0-Preview5
         with:
           args:
             build -c azure.ad --b7a.config.file=src/azure.ad/tests/resources/azure-ad-config.toml
