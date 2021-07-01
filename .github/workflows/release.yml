@@ -1,0 +1,31 @@
+name: Deployment
+
+on:
+  release:
+    types: [published]
+
+jobs:
+    build:
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Ballerina Build
+              uses: ballerina-platform/ballerina-action/@master
+              with:
+                  args:
+                      build -c ./aad
+              env:
+                  REFRESH_URL: ${{ secrets.REFRESH_URL }}
+                  REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+                  CLIENT_ID: ${{ secrets.CLIENT_ID }}
+                  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            - name: Ballerina Push
+              uses: ballerina-platform/ballerina-action/@master
+              with:
+                  args:
+                      push
+              env:
+                  BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
+                  
