@@ -40,6 +40,8 @@ Configuration configuration = {
 
 Client oneDriveClient = check new(configuration);
 
+string newUserId = "";
+
 var randomString = createRandomUUIDWithoutHyphens();
 
 @test:Config {
@@ -53,20 +55,79 @@ function testCreateUser() {
 
     NewUser info = {
         accountEnabled: true,
-        displayName: "Joshamee Gibbs",
+        displayName: string `CrewMember ${randomString}`,
         userPrincipalName: userPricipalName,
-        mailNickname: "MasterGibbs",
+        mailNickname: randomString,
         passwordProfile: {
             password: "xWwvJ]6NMw+bWH-d",
             forceChangePasswordNextSignIn: true
-        }
+        },
+        surname: "Rasinga"
     };
 
     User|error user = oneDriveClient->createUser(info);
     if (user is User) {
-        log:printInfo("User created " + user.toString());
+        newUserId = user?.id.toString();
+        log:printInfo("User created " + user?.id.toString());
     } else {
         test:assertFail(msg = user.message());
+    }
+    io:println("\n\n");
+}
+
+@test:Config {
+    enable: true,
+    dependsOn: [testCreateUser]
+}
+function testGetUser() {
+    log:printInfo("client->getUser()");
+    runtime:sleep(2);
+
+    string userId = newUserId;
+    User|error user = oneDriveClient->getUser(userId);
+    if (user is User) {
+        log:printInfo("User " + user.toString());
+    } else {
+        test:assertFail(msg = user.message());
+    }
+    io:println("\n\n");
+}
+
+@test:Config {
+    enable: true,
+    dependsOn: [testGetUser]
+}
+function testUpdateUser() {
+    log:printInfo("client->updateUser()");
+    runtime:sleep(2);
+
+    string userId = newUserId;
+    UpdateUser info = {
+    };
+    Error? result = oneDriveClient->updateUser(userId, info);
+    if (result is ()) {
+        log:printInfo("Sucessfully updated");
+    } else {
+        test:assertFail(msg = result.message());
+    }
+    io:println("\n\n");
+}
+
+@test:Config {
+    enable: false,
+    dependsOn: [testUpdateUser]
+}
+function testDeleteUser() {
+    log:printInfo("client->deleteUser()");
+    runtime:sleep(2);
+
+    string userId = newUserId;
+
+    Error? result = oneDriveClient->deleteUser(userId);
+    if (result is ()) {
+        log:printInfo("Sucessfully deleted");
+    } else {
+        test:assertFail(msg = result.message());
     }
     io:println("\n\n");
 }

@@ -28,20 +28,46 @@ public type Configuration record {|
 
 # Represents a new user to be added to the active directory.
 # 
-# + accountEnabled - True if the account is enabled or else false
 # + displayName - The name displayed in the address book for the user
 # + onPremisesImmutableId - This property is used to associate an on-premise active directory user account to its Azure 
 #                           AD user object
-# + mailNickname - The mail alias for the user
 # + passwordProfile - Specifies the password profile for the user
 # + userPrincipalName - The user principal name (UPN) of the user
-public type NewUser record {
-    boolean accountEnabled;
-    string displayName;
+public type BaseUserData record {
     string onPremisesImmutableId?;
-    string mailNickname;
-    PasswordProfile passwordProfile;
-    string userPrincipalName;
+    PasswordProfile passwordProfile?;
+
+    string aboutMe?;
+    AgeGroup ageGroup?;
+    string birthday?;
+    string[] businessPhones?;
+    string city?;
+    string companyName?;
+    ConcentForMinor consentProvidedForMinor?;
+    string country?;
+    string department?;
+    string employeeId?;
+    EmployeeType employeeType?;
+    string? givenName?;
+    string hireDate?;
+    string[] interests?;
+    string? jobTitle?;
+    string? mail?;
+    string? mobilePhone?;
+    string mySite?;
+    string? officeLocation?;
+    string otherMails?;
+    string passwordPolicies?;//enum
+    string[] pastProjects?;
+    string postalCode?;
+    string? preferredLanguage?;
+    string[] responsibilities?;
+    string[] schools?;
+    string[] skills?;
+    string state?;
+    string streetAddress?;
+    string usageLocation?;//enum
+    string? surname?;
 };
 
 # Password profile associated with a user.
@@ -56,14 +82,52 @@ public type PasswordProfile record {|
     string password;
 |};
 
-public type User record {
-    string id;
+# Description
+#
+# + accountEnabled - True if the account is enabled or else false
+# + mailNickname - The mail alias for the user
+public type NewUser record {
+    boolean accountEnabled;
+    string mailNickname;
     string displayName;
     string userPrincipalName;
-    string[] businessPhones;
-    string? givenName;
-    string? surname;
-    string? jobTitle;
-    string? mail;
-    // Add others which are returned from the query params
+    *BaseUserData;
+};
+
+# Description
+#
+# + accountEnabled - True if the account is enabled or else false
+# + mailNickname - The mail alias for the user
+public type UpdateUser record {
+    boolean accountEnabled?;
+    string mailNickname?;
+    string displayName?;
+    string userPrincipalName?;
+    *BaseUserData;
+};
+
+public type User record {
+    string id?;
+    string displayName?;
+    string userPrincipalName?;
+    *BaseUserData;
+    ExtentionAttriute onPremisesExtensionAttributes?;
+};
+
+public type ExtentionAttriute record {
+    string extensionAttribute1?;
+    string extensionAttribute2?;
+    string extensionAttribute3?;
+    string extensionAttribute4?;
+    string extensionAttribute5?;
+    string extensionAttribute6?;
+    string extensionAttribute7?;
+    string extensionAttribute8?;
+    string extensionAttribute9?;
+    string extensionAttribute10?;
+    string extensionAttribute11?;
+    string extensionAttribute12?;
+    string extensionAttribute13?;
+    string extensionAttribute14?;
+    string extensionAttribute15?;
 };

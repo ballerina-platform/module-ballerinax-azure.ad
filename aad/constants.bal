@@ -14,6 +14,61 @@
 // specific language governing permissions and limitations
 // under the License.
 
+# The age group of the user.
+# 
+# + NULL - Default value, no ageGroup has been set for the user
+# + MINOR - The user is considered a minor
+# + NOT_ADULT - Teenagers who are considered as notAdult in regulated countries
+# + ADULT - The user should be a treated as an adult
+public enum AgeGroup {
+    NULL = "null",
+    MINOR = "minor",
+    NOT_ADULT = "notAdult",
+    ADULT = "adult"
+}
+
+# Condition of the capability assignment. 
+# 
+# + ENABLED - Available for normal use
+# + WARNING - Available for normal use but is in a grace period
+# + SUSPENDED - Unavailable but any data associated with the capability must be preserved
+# + DELETED - Unavailable and any data associated with the capability may be deleted
+# + LOCKED_OUT - Unavailable for all administrators and users but any data associated with the capability must be 
+#                preserved
+public enum CapabilityStatus {
+    ENABLED = "Enabled",
+    WARNING = "Warning",
+    SUSPENDED = "Suspended",
+    DELETED = "Deleted",
+    LOCKED_OUT = "LockedOut"
+}
+
+# Consent which has been obtained for minors.
+# 
+# + NULL_CONCENT - Default value, no consentProvidedForMinor has been set for the user
+# + GRANTED - Consent has been obtained for the user to have an account
+# + DENIED - Consent has not been obtained for the user to have an account
+# + NOT_REQUIRED - The user is from a location that does not require consent
+public enum ConcentForMinor {
+    NULL_CONCENT = "null",
+    GRANTED = "granted",
+    DENIED = "denied",
+    NOT_REQUIRED = "notRequired"
+}
+
+#  	Represent the enterprise worker type.
+# 
+# + EMPLOYEE - 
+# + CONTRACTOR - 
+# + CONSULTANT - 
+# + VENDOR - 
+public enum EmployeeType {
+    EMPLOYEE = "Employee",
+    CONTRACTOR = "Contractor",
+    CONSULTANT = "Consultant",
+    VENDOR = "Vendor"
+}
+
 enum SystemQueryOption {
     EXPAND = "expand",
     SELECT = "select",
