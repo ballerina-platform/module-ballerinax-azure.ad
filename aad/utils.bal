@@ -63,6 +63,8 @@ isolated function appendQueryOption(string queryParameter, string connectingStri
             // non odata query parameters
             url += connectingString + queryParameter;
         }
+    } else if (queryParameter.substring(ZERO) == "$count") {
+        url += connectingString + queryParameter;
     } else {
         return error QueryParameterValidationError(INVALID_QUERY_PARAMETER);
     }

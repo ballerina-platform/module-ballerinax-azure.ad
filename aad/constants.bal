@@ -56,7 +56,7 @@ public enum ConcentForMinor {
     NOT_REQUIRED = "notRequired"
 }
 
-#  	Represent the enterprise worker type.
+# Represent the enterprise worker type.
 # 
 # + EMPLOYEE - 
 # + CONTRACTOR - 
@@ -67,6 +67,28 @@ public enum EmployeeType {
     CONTRACTOR = "Contractor",
     CONSULTANT = "Consultant",
     VENDOR = "Vendor"
+}
+
+# Specifies the visibility of a Microsoft 365 group.
+# 
+# + PRIVATE -
+# + PUBLIC - 
+# + HIDDEN - 
+# + EMPTY -
+public enum GroupVisibility {
+    PRIVATE = "Private",
+    PUBLIC = "Public",
+    HIDDEN = "HiddenMembership",
+    EMPTY = ""
+}
+
+# Specifies the visibility of a Microsoft 365 group.
+# 
+# + USER -
+# + GROUP - 
+public enum DirctoryObject {
+    USER = "user",
+    GROUP = "group"
 }
 
 enum SystemQueryOption {
@@ -111,3 +133,13 @@ const QUESTION_MARK = "?";
 
 # Numbers
 const ZERO = 0;
+
+# Path parameters
+const USERS = "users";
+const GROUPS = "users";
+const MEMBER_OF = "memberOf";
+const MEMBERS = "members";
+const TRANSITIVE_MEMBERS = "transitiveMembers";
+const OWNERS = "owners";
+const TRANSITIVE_MEMBER_OF = "transitiveMemberOf";
+const PERMISSION_GRANTS = "permissionGrants";
