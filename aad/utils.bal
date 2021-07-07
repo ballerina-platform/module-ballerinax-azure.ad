@@ -16,15 +16,15 @@
 
 import ballerina/http;
 
-isolated function handleResponse(http:Response httpResponse) returns @tainted map<json>|Error? {
+isolated function handleResponse(http:Response httpResponse) returns @tainted map<json>|Error {
     if (httpResponse.statusCode is http:STATUS_OK|http:STATUS_CREATED|http:STATUS_ACCEPTED) {
         json jsonResponse = check httpResponse.getJsonPayload();
         return <map<json>>jsonResponse;
     } else if (httpResponse.statusCode is http:STATUS_NO_CONTENT) {
-        return;
+        return {};
     }
     json errorPayload = check httpResponse.getJsonPayload();
-    string message = errorPayload.toString(); // Error should be defined as a user defined object
+    string message = errorPayload.toString();
     return error PayloadValidationError(message);
 }
 
@@ -63,8 +63,6 @@ isolated function appendQueryOption(string queryParameter, string connectingStri
             // non odata query parameters
             url += connectingString + queryParameter;
         }
-    } else if (queryParameter.substring(ZERO) == "$count") {
-        url += connectingString + queryParameter;
     } else {
         return error QueryParameterValidationError(INVALID_QUERY_PARAMETER);
     }
@@ -108,4 +106,10 @@ isolated function matchClosing(string value) returns boolean {
         }
     }
     return false;
+}
+
+isolated function removeKey(map<json> jsonMap, string mapKey) {
+    if (jsonMap.hasKey(mapKey)) {
+        _ = jsonMap.remove(mapKey);
+    }
 }

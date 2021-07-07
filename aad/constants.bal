@@ -136,7 +136,7 @@ const ZERO = 0;
 
 # Path parameters
 const USERS = "users";
-const GROUPS = "users";
+const GROUPS = "groups";
 const MEMBER_OF = "memberOf";
 const MEMBERS = "members";
 const TRANSITIVE_MEMBERS = "transitiveMembers";

@@ -48,8 +48,7 @@ public client class Client {
                                         @tainted User|Error {
         string path = check createUrl([USERS]);
         json payload = check info.cloneWithType(json);
-        http:Response response = check self.httpClient->post(path, payload);
-        return check convertJsonToUser(response);
+        return check self.httpClient->post(path, payload, targetType = User);
     }
 
     # Get information about a user.
@@ -65,8 +64,7 @@ public client class Client {
                                      @display {label: "Optional Query Parameters"} string[] queryParams = []) 
                                      returns @tainted User|error {
         string path = check createUrl([USERS, userId], queryParams);   
-        http:Response response = check self.httpClient->get(path);
-        return check convertJsonToUser(response);
+        return check self.httpClient->get(path, targetType = User);
     }
 
     # Update information about a user.
@@ -81,7 +79,7 @@ public client class Client {
         string path = check createUrl([USERS, userId]); 
         json payload = check info.cloneWithType(json);   
         http:Response response = check self.httpClient->patch(path, payload);
-        return check handleEmptyJsonResponse(response);
+        _ = check handleResponse(response);
     }
 
     # List information about users.
@@ -97,7 +95,7 @@ public client class Client {
         string path = check createUrl([USERS], queryParams);
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         UserStream objectInstance = check new (self.httpClient, path);
         stream<User, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -111,7 +109,7 @@ public client class Client {
     remote isolated function deleteUser(@display {label: "User ID"} string userId) returns @tainted Error? {
         string path = check createUrl([USERS, userId]); 
         http:Response response = check self.httpClient->delete(path);
-        return check handleEmptyJsonResponse(response);    
+        _ = check handleResponse(response);    
     }
 
     // ************************************* Operations on a Group resource ********************************************
@@ -125,9 +123,8 @@ public client class Client {
     remote isolated function createGroup(@display {label: "New Group Information"} NewGroup info) 
                                          returns @tainted Group|Error {
         string path = check createUrl([GROUPS]);
-        json payload = check info.cloneWithType(json);
-        http:Response response = check self.httpClient->post(path, payload);
-        return check convertJsonToGroup(response);
+        json payload = check convertNewGroupToJson(info);
+        return check self.httpClient->post(path, payload, targetType = Group);
     }
 
     # Get information about a group.
@@ -143,8 +140,7 @@ public client class Client {
                                       @display {label: "Optional Query Parameters"} string[] queryParams = []) 
                                       returns @tainted Group|error {
         string path = check createUrl([GROUPS, groupId], queryParams);   
-        http:Response response = check self.httpClient->get(path);
-        return check convertJsonToGroup(response);
+        return check self.httpClient->get(path, targetType = Group);
     }
 
     # Update information about a group.
@@ -159,7 +155,8 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId]); 
         json payload = check info.cloneWithType(json); 
         http:Response response = check self.httpClient->patch(path, payload);
-        return check handleEmptyJsonResponse(response);  
+        _ = check handleResponse(response);
+  
     }
 
     # List information about groups.
@@ -175,7 +172,7 @@ public client class Client {
         string path = check createUrl([GROUPS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         GroupStream objectInstance = check new (self.httpClient, path);
         stream<Group, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -189,7 +186,8 @@ public client class Client {
     remote isolated function deleteGroup(@display {label: "Group ID"} string groupId) returns @tainted Error? {
         string path = check createUrl([GROUPS, groupId]); 
         http:Response response = check self.httpClient->delete(path);
-        return check handleEmptyJsonResponse(response);   
+        _ = check handleResponse(response);
+   
     }
 
     # Renews a group's expiration. When a group is renewed, the group expiration is extended by the number of days 
@@ -201,7 +199,7 @@ public client class Client {
     remote isolated function renewGroup(@display {label: "Group ID"} string groupId) returns @tainted Error? {
         string path = check createUrl([GROUPS, groupId, "renew"]); 
         http:Response response = check self.httpClient->post(path, {});
-        return check handleEmptyJsonResponse(response);    
+        _ = check handleResponse(response);    
     }
 
     # List groups that the group is a direct member of.
@@ -226,7 +224,7 @@ public client class Client {
         }
         
         http:Response response = check self.httpClient->get(path);
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         GroupStream objectInstance = check new (self.httpClient, path);
         stream<Group, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -256,7 +254,7 @@ public client class Client {
         }
         
         http:Response response = check self.httpClient->get(path);
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         GroupStream objectInstance = check new (self.httpClient, path);
         stream<Group, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -289,7 +287,7 @@ public client class Client {
         }
 
         http:Response response = check self.httpClient->post(path, payload);
-        return check handleEmptyJsonResponse(response);    
+        _ = check handleResponse(response);    
     }
 
     # Get a list of the group's direct members.
@@ -307,7 +305,7 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId, MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         UserStream objectInstance = check new (self.httpClient, path);
         stream<User, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -329,7 +327,7 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId, TRANSITIVE_MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         UserStream objectInstance = check new (self.httpClient, path);
         stream<User, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -345,7 +343,7 @@ public client class Client {
                                                @display {label: "Member ID"} string memberId) returns @tainted Error? {
         string path = check createUrl([GROUPS, groupId, MEMBERS, memberId, "$ref"]); 
         http:Response response = check self.httpClient->delete(path);
-        return check handleEmptyJsonResponse(response);        
+        _ = check handleResponse(response);        
     }
 
     # Add a user or service principal to the group's owners. The owners are a set of users or service principals who are 
@@ -363,7 +361,7 @@ public client class Client {
         };
         
         http:Response response = check self.httpClient->post(path, payload);
-        return check handleEmptyJsonResponse(response);        
+        _ = check handleResponse(response);        
     }
 
     # Retrieve a list of the group's owners.
@@ -381,7 +379,7 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId, OWNERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         UserStream objectInstance = check new (self.httpClient, path);
         stream<User, Error> finalStream = new (objectInstance);
         return finalStream; 
@@ -398,7 +396,7 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId, OWNERS, ownerId, "$ref"]); 
         
         http:Response response = check self.httpClient->delete(path);
-        return check handleEmptyJsonResponse(response);        
+        _ = check handleResponse(response);        
     }
 
     # List all resource-specific permission grants on the group. This list specifies the Azure AD apps that have access 
@@ -418,7 +416,7 @@ public client class Client {
         string path = check createUrl([GROUPS, groupId, PERMISSION_GRANTS]);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string? handledResponse = check handleResponse(response);
+        map<json>|string handledResponse = check handleResponse(response);
         PermissionGrantStream objectInstance = check new (self.httpClient, path);
         stream<PermissionGrant, Error> finalStream = new (objectInstance);
         return finalStream; 

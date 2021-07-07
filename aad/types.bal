@@ -235,7 +235,9 @@ public type BaseGroupData record {
 # + mailEnabled - Specifies whether the group is mail-enabled  
 # + securityEnabled -Specifies whether the group is a security group  
 # + mailNickname - The mail alias for the group
-# + resourceBehaviorOptions - Specifies the group behaviors that can be set for a Microsoft 365 group during creation  
+# + resourceBehaviorOptions - Specifies the group behaviors that can be set for a Microsoft 365 group during creation
+# + ownerIds - Represents the owners for the group at creation time.
+# + memberIds - Represents the members for the group at creation time 
 public type NewGroup record {
     *BaseGroupData;
     string[] groupTypes;//enum[] https://docs.microsoft.com/en-us/graph/api/resources/groups-overview?view=graph-rest-1.0
@@ -244,6 +246,8 @@ public type NewGroup record {
     boolean securityEnabled;
     string mailNickname;
     string[] resourceBehaviorOptions?; //enum
+    string[] ownerIds?;
+    string[] memberIds?;
 };
 
 # Represents updatable Azure AD group information.

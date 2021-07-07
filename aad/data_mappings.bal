@@ -14,33 +14,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
-import ballerina/io;
-
-isolated function convertJsonToUser(http:Response response) returns User|Error {
-    map<json>|string? handledResponse = check handleResponse(response);
-    if (handledResponse is map<json>) {
-        io:println(handledResponse);
-        return check handledResponse.cloneWithType(User);
-    } else {
-        return error PayloadValidationError(INVALID_RESPONSE);
-    } 
-}
-
-isolated function convertJsonToGroup(http:Response response) returns Group|Error {
-    map<json>|string? handledResponse = check handleResponse(response);
-    if (handledResponse is map<json>) { 
-        return check handledResponse.cloneWithType(Group);
-    } else {
-        return error PayloadValidationError(INVALID_RESPONSE);
-    } 
-}
-
-isolated function handleEmptyJsonResponse(http:Response response) returns Error? {
-    map<json>|string? handledResponse = check handleResponse(response);
-    if (handledResponse is ()) {  
-        return;
-    } else {
-        return error PayloadValidationError(INVALID_RESPONSE);
+isolated function convertNewGroupToJson(NewGroup info) returns json|Error? {
+    json newGroup = check info.cloneWithType(json);
+    string[] ownerIds = info?.ownerIds ?: [];
+    string[] memberIds = info?.memberIds ?: [];
+    if (ownerIds.length() >= 1) {
+        string[] ownerArray = [];
+        foreach string id in ownerIds {
+            ownerArray.push(string `https://graph.microsoft.com/v1.0/users/${id}`);
+        }
+        _ = check newGroup.mergeJson({
+            "owners@odata.bind" : ownerArray
+        });
     }
+
+    if (memberIds.length() >= 1) {
+        string[] memberArray = [];
+        foreach string id in memberIds {
+            memberArray.push(string `https://graph.microsoft.com/v1.0/users/${id}`);
+        }
+        _ = check newGroup.mergeJson({
+            "members@odata.bind" : memberArray
+        });
+    }
+    removeKey(<map<json>>newGroup, "ownerIds");
+    removeKey(<map<json>>newGroup, "memberIds");
+    return newGroup;
 }

@@ -32,20 +32,18 @@ Configuration configuration = {
         refreshUrl: refreshUrl,
         refreshToken : refreshToken,
         clientId : clientId,
-        clientSecret : clientSecret,
-        scopes: ["offline_access","https://graph.microsoft.com/.default"]
+        clientSecret : clientSecret
     }
 };
-
 
 Client aadClient = check new(configuration);
 
 string newUserId = "";
-
+string newGroupId = "";
 var randomString = createRandomUUIDWithoutHyphens();
 
 @test:Config {
-    enable: false
+    enable: true
 }
 function testCreateUser() {
     log:printInfo("client->createUser()");
@@ -55,9 +53,9 @@ function testCreateUser() {
 
     NewUser info = {
         accountEnabled: true,
-        displayName: string `CrewMember ${randomString}`,
+        displayName: string `CrewMember${randomString}`,
         userPrincipalName: userPricipalName,
-        mailNickname: randomString,
+        mailNickname: string `user${randomString}`,
         passwordProfile: {
             password: "xWwvJ]6NMw+bWH-d",
             forceChangePasswordNextSignIn: true
@@ -65,7 +63,7 @@ function testCreateUser() {
         surname: "Rasinga"
     };
 
-    User|error user = aadClient->createUser(info);
+    User|Error user = aadClient->createUser(info);
     if (user is User) {
         newUserId = user?.id.toString();
         log:printInfo("User created " + user?.id.toString());
@@ -84,29 +82,7 @@ function testGetUser() {
     runtime:sleep(2);
 
     string userId = newUserId;
-    //string userId = "b3bbe751-6c6c-4614-81b8-5e569130eb8b";
-    User|error user = aadClient->getUser(userId);
-    if (user is User) {
-        log:printInfo("User " + user.toString());
-    } else {
-        test:assertFail(msg = user.message());
-    }
-    io:println("\n\n");
-}
-
-@test:Config {
-    enable: true
-    dependsOn: [testCreateUser]
-}
-function testGetUserWithQueryParams() {
-    log:printInfo("client->getUserWithParams()");
-    runtime:sleep(2);
-
-    string userId = newUserId;
-    //string userId = "b3bbe751-6c6c-4614-81b8-5e569130eb8b";
-    string[] params = ["$select=displayName,givenName,onPremisesExtensionAttributes,ageGroup,responsibilities"];
-
-    User|error user = aadClient->getUser(userId, params);
+    User|Error user = aadClient->getUser(userId);
     if (user is User) {
         log:printInfo("User " + user.toString());
     } else {
@@ -117,7 +93,27 @@ function testGetUserWithQueryParams() {
 
 @test:Config {
     enable: true,
-    dependsOn: [testGetUser]
+    dependsOn: [testCreateUser]
+}
+function testGetUserWithQueryParams() {
+    log:printInfo("client->getUserWithParams()");
+    runtime:sleep(2);
+
+    string userId = newUserId;
+    string[] params = ["$select=displayName,givenName,onPremisesExtensionAttributes,ageGroup,responsibilities"];
+
+    User|Error user = aadClient->getUser(userId, params);
+    if (user is User) {
+        log:printInfo("User " + user.toString());
+    } else {
+        test:assertFail(msg = user.message());
+    }
+    io:println("\n\n");
+}
+
+@test:Config {
+    enable: true,
+    dependsOn: [testGetUser, testGetUserWithQueryParams]
 }
 function testUpdateUser() {
     log:printInfo("client->updateUser()");
@@ -126,11 +122,11 @@ function testUpdateUser() {
     string userId = newUserId;
     UpdateUser info = {
     };
-    Error? result = aadClient->updateUser(userId, info);
-    if (result is ()) {
+    Error? userInfo = aadClient->updateUser(userId, info);
+    if (userInfo is ()) {
         log:printInfo("Sucessfully updated");
     } else {
-        test:assertFail(msg = result.message());
+        test:assertFail(msg = userInfo.message());
     }
     io:println("\n\n");
 }
@@ -162,7 +158,7 @@ function testListUsersQueryParams() {
     log:printInfo("client->listUsersWithParams()");
     runtime:sleep(2);
 
-    string[] params = ["$count"];
+    string[] params = ["$count=true"];
 
     stream<User,Error>|Error userStream = aadClient->listUsers(params);
     if (userStream is stream<User,Error>) {
@@ -177,45 +173,27 @@ function testListUsersQueryParams() {
 
 @test:Config {
     enable: true,
-    dependsOn: [testUpdateUser]
-}
-function testDeleteUser() {
-    log:printInfo("client->deleteUser()");
-    runtime:sleep(2);
-
-    string userId = newUserId;
-
-    Error? result = aadClient->deleteUser(userId);
-    if (result is ()) {
-        log:printInfo("Sucessfully deleted");
-    } else {
-        test:assertFail(msg = result.message());
-    }
-    io:println("\n\n");
-}
-
-@test:Config {
-    enable: false
+    dependsOn: [testCreateUser]
 }
 function testCreateGroup() {
     log:printInfo("client->createGroup()");
     runtime:sleep(2);
-
-    string userPricipalName = string `${randomString}.pirate@chethya.onmicrosoft.com`;
 
     NewGroup info = {
         description: "Self help community for library",
         displayName: "Library Assist",
         groupTypes:["Unified"],
         mailEnabled: true,
-        mailNickname: "lib",
+        mailNickname: string `group${randomString}`,
         securityEnabled: false
+        //ownerIds: [newUserId], // we can add owners and members at the group creation itself too
+        //memberIds: [newUserId]
     };
 
-    Group|error group = aadClient->createGroup(info);
+    Group|Error group = aadClient->createGroup(info);
     if (group is Group) {
-        newUserId = group?.id.toString();
-        log:printInfo("User created " + group?.id.toString());
+        newGroupId = group?.id.toString();
+        log:printInfo("Group created " + group?.id.toString());
     } else {
         test:assertFail(msg = group.message());
     }
@@ -223,13 +201,15 @@ function testCreateGroup() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateGroup]
 }
 function testGetGroup() {
     log:printInfo("client->getGroup()");
     runtime:sleep(2);
 
-    string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
+    string groupId = newGroupId;
+
     Group|Error group = aadClient->getGroup(groupId);
     if (group is Group) {
         log:printInfo("Group " + group.toString());
@@ -240,15 +220,16 @@ function testGetGroup() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateGroup]
 }
 function testUpdateGroup() {
     log:printInfo("client->updateGroup()");
     runtime:sleep(2);
 
-    string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
+    string groupId = newGroupId;
     UpdateGroup info = {
-        mailNickname: "Up"
+        mailNickname: string `grouprename${randomString}`
     };
     Error? result = aadClient->updateGroup(groupId, info);
     if (result is ()) {
@@ -260,7 +241,7 @@ function testUpdateGroup() {
 }
 
 @test:Config {
-    enable: false
+    enable: true
 }
 function testListGroups() {
     log:printInfo("client->listGroups()");
@@ -278,31 +259,14 @@ function testListGroups() {
 }
 
 @test:Config {
-    enable: false
-}
-function testDeleteGroup() {
-    log:printInfo("client->deleteGroup()");
-    runtime:sleep(2);
-
-    string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
-
-    Error? result = aadClient->deleteGroup(groupId);
-    if (result is ()) {
-        log:printInfo("Sucessfully deleted");
-    } else {
-        test:assertFail(msg = result.message());
-    }
-    io:println("\n\n");
-}
-
-@test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateGroup]
 }
 function testRenewGroup() {
     log:printInfo("client->renewGroup()");
     runtime:sleep(2);
 
-    string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
+    string groupId = newGroupId;
 
     Error? result = aadClient->renewGroup(groupId);
     if (result is ()) {
@@ -313,55 +277,58 @@ function testRenewGroup() {
     io:println("\n\n");
 }
 
-// @test:Config {
-//     enable: false
-// }
-// function testListParentGroups() { //test this for groups and users
-//     log:printInfo("client->listParentGroups()");
-//     runtime:sleep(2);
+@test:Config {
+    enable: true,
+    dependsOn: [testCreateGroup]
+}
+function testListParentGroups() { //test this for groups and users
+    log:printInfo("client->listParentGroups()");
+    runtime:sleep(2);
 
-//     string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
+    string groupId = newGroupId;
 
-//     stream<Group,Error>|Error groupStream = aadClient->listParentGroups("group", groupId);
-//     if (groupStream is stream<Group,Error>) {
-//         Error? e = groupStream.forEach(isolated function (Group item) {
-//             log:printInfo(item.toString());
-//         });    
-//     } else {
-//         test:assertFail(msg = groupStream.message());
-//     }
-//     io:println("\n\n");
-// }
-
-// @test:Config {
-//     enable: false
-// }
-// function testListTransitiveParentGroups() { //test this for groups and users
-//     log:printInfo("client->listParentGroups()");
-//     runtime:sleep(2);
-
-//     string groupId = "55199f19-1e43-4dd8-a25d-89428656eefb";
-
-//     stream<Group,Error>|Error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
-//     if (groupStream is stream<Group,Error>) {
-//         Error? e = groupStream.forEach(isolated function (Group item) {
-//             log:printInfo(item.toString());
-//         });    
-//     } else {
-//         test:assertFail(msg = groupStream.message());
-//     }
-//     io:println("\n\n");
-// }
+    stream<Group,Error>|Error groupStream = aadClient->listParentGroups("group", groupId);
+    if (groupStream is stream<Group,Error>) {
+        Error? e = groupStream.forEach(isolated function (Group item) {
+            log:printInfo(item.toString());
+        });    
+    } else {
+        test:assertFail(msg = groupStream.message());
+    }
+    io:println("\n\n");
+}
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateGroup]
+}
+function testListTransitiveParentGroups() { //test this for groups and users
+    log:printInfo("client->listParentGroups()");
+    runtime:sleep(2);
+
+    string groupId = newGroupId;
+
+    stream<Group,Error>|Error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
+    if (groupStream is stream<Group,Error>) {
+        Error? e = groupStream.forEach(isolated function (Group item) {
+            log:printInfo(item.toString());
+        });    
+    } else {
+        test:assertFail(msg = groupStream.message());
+    }
+    io:println("\n\n");
+}
+
+@test:Config {
+    enable: true,
+    dependsOn: [testCreateUser, testCreateGroup]
 }
 function testAddMemberToGroup() {
     log:printInfo("client->addGroupMember()");
     runtime:sleep(2);
 
-    string groupId = "1e7a4360-0a8a-4ec4-9b3d-9ffdcf1cb92f";
-    string memberId = "8323de12-2bba-4658-a115-1fcb86d5f4f5";
+    string groupId = newGroupId;
+    string memberId = newUserId;
 
     Error? result = aadClient->addGroupMember(groupId, memberId);
     if (result is ()) {
@@ -373,13 +340,14 @@ function testAddMemberToGroup() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListMembers() { //test this for groups and users
+function testListMembers() {
     log:printInfo("client->listGroupMembers()");
     runtime:sleep(2);
 
-    string groupId = "1e7a4360-0a8a-4ec4-9b3d-9ffdcf1cb92f";
+    string groupId = newGroupId;
 
     stream<User,Error>|Error groupStream = aadClient->listGroupMembers(groupId);
     if (groupStream is stream<User,Error>) {
@@ -393,13 +361,14 @@ function testListMembers() { //test this for groups and users
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListTransitiveMembers() { //test this for groups and users
+function testListTransitiveMembers() {
     log:printInfo("client->listTransitiveGroupMembers()");
     runtime:sleep(2); 
 
-    string groupId = "1e7a4360-0a8a-4ec4-9b3d-9ffdcf1cb92f";
+    string groupId = newGroupId;
 
     stream<User,Error>|Error groupStream = aadClient->listTransitiveGroupMembers(groupId);
     if (groupStream is stream<User,Error>) {
@@ -413,18 +382,19 @@ function testListTransitiveMembers() { //test this for groups and users
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
 function testRemoveMember() {
     log:printInfo("client->removeGroupMember()");
     runtime:sleep(2);
 
-    string groupId = "fd1b4442-4c0d-472b-b87e-dc9155200ce5";
-    string memberId = "b3bbe751-6c6c-4614-81b8-5e569130eb8b";
+    string groupId = newGroupId;
+    string memberId = newUserId;
 
     Error? result = aadClient->removeGroupMember(groupId, memberId);
     if (result is ()) {
-        log:printInfo("Sucessfully deleted");
+        log:printInfo("Sucessfully removed");
     } else {
         test:assertFail(msg = result.message());
     }
@@ -432,14 +402,15 @@ function testRemoveMember() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateUser, testCreateGroup]
 }
 function testAddOwnerToGroup() {
     log:printInfo("client->addGroupOwner()");
     runtime:sleep(2);
 
-    string groupId = "1e7a4360-0a8a-4ec4-9b3d-9ffdcf1cb92f";
-    string ownerId = "8323de12-2bba-4658-a115-1fcb86d5f4f5";
+    string groupId = newGroupId;
+    string ownerId = newUserId;
 
     Error? result = aadClient->addGroupOwner(groupId, ownerId);
     if (result is ()) {
@@ -451,13 +422,14 @@ function testAddOwnerToGroup() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testAddOwnerToGroup, testCreateGroup]
 }
 function testListOwners() {
     log:printInfo("client->listGroupOwners()");
     runtime:sleep(2);
 
-    string groupId = "1e7a4360-0a8a-4ec4-9b3d-9ffdcf1cb92f";
+    string groupId = newGroupId;
 
     stream<User,Error>|Error groupStream = aadClient->listGroupOwners(groupId);
     if (groupStream is stream<User,Error>) {
@@ -471,14 +443,15 @@ function testListOwners() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testAddOwnerToGroup, testCreateGroup]
 }
 function testRemoveOwner() {
     log:printInfo("client->removeGroupOwner()");
     runtime:sleep(2);
 
-    string groupId = "fd1b4442-4c0d-472b-b87e-dc9155200ce5";
-    string ownerId = "73a77e1e-31c0-4a99-ac1d-733053b16cbe";
+    string groupId = newGroupId;
+    string ownerId = newUserId;
 
     Error? result = aadClient->removeGroupOwner(groupId, ownerId);
     if (result is ()) {
@@ -490,13 +463,14 @@ function testRemoveOwner() {
 }
 
 @test:Config {
-    enable: false
+    enable: true,
+    dependsOn: [testCreateGroup]
 }
 function testListPermissionGrants() {
     log:printInfo("client->listPermissionGrants()");
     runtime:sleep(2);
 
-    string groupId = "fd1b4442-4c0d-472b-b87e-dc9155200ce5";
+    string groupId = newGroupId;
 
     stream<PermissionGrant,Error>|Error grantStream = aadClient->listPermissionGrants(groupId);
     if (grantStream is stream<PermissionGrant,Error>) {
@@ -507,6 +481,30 @@ function testListPermissionGrants() {
         test:assertFail(msg = grantStream.message());
     }
     io:println("\n\n");
+}
+
+@test:AfterSuite {}
+function testDeleteUserAndGroup() {
+    runtime:sleep(2);
+
+    string userId = newUserId;
+    string groupId = newGroupId;
+
+    log:printInfo("client->deleteUser()");
+    Error? userDeleteResult = aadClient->deleteUser(userId);
+    if (userDeleteResult is ()) {
+        log:printInfo("Sucessfully deleted the user");
+    } else {
+        test:assertFail(msg = userDeleteResult.message());
+    }
+
+    log:printInfo("client->deleteGroup()");
+    Error? groupDeleteResult = aadClient->deleteGroup(groupId);
+    if (userDeleteResult is ()) {
+        log:printInfo("Sucessfully deleted group");
+    } else {
+        test:assertFail(msg = userDeleteResult.message());
+    }
 }
 
 # Create a random UUID removing the unnecessary hyphens which will interrupt querying opearations.
