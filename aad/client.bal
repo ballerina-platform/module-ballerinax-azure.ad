@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-//import ballerina/io;
 
 # Azure AD Client Object for executing drive operations.
 # 

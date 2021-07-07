@@ -58,10 +58,10 @@ public enum ConcentForMinor {
 
 # Represent the enterprise worker type.
 # 
-# + EMPLOYEE - 
-# + CONTRACTOR - 
-# + CONSULTANT - 
-# + VENDOR - 
+# + EMPLOYEE - Employee type
+# + CONTRACTOR - Contractor type
+# + CONSULTANT - Consultant type
+# + VENDOR - Vendor type
 public enum EmployeeType {
     EMPLOYEE = "Employee",
     CONTRACTOR = "Contractor",
@@ -71,10 +71,15 @@ public enum EmployeeType {
 
 # Specifies the visibility of a Microsoft 365 group.
 # 
-# + PRIVATE -
-# + PUBLIC - 
-# + HIDDEN - 
-# + EMPTY -
+# + PRIVATE - - Owner permission is needed to join the group. 
+#             - Non-members cannot view the contents of the group.
+# + PUBLIC - Anyone can join the group without needing owner permission. Anyone can view the contents of the group.
+# + HIDDEN - - Owner permission is needed to join the group.
+#            - Non-members cannot view the contents of the group.
+#            - Non-members cannot see the members of the group.
+#            - Administrators (global, company, user, and helpdesk) can view the membership of the group.
+#            - The group appears in the global address book (GAL).
+# + EMPTY - No visibility specified
 public enum GroupVisibility {
     PRIVATE = "Private",
     PUBLIC = "Public",
@@ -84,11 +89,89 @@ public enum GroupVisibility {
 
 # Specifies the visibility of a Microsoft 365 group.
 # 
-# + USER -
-# + GROUP - 
+# + USER - User object
+# + GROUP - Group object
 public enum DirctoryObject {
     USER = "user",
     GROUP = "group"
+}
+
+# Specifies password policies for the user.
+# 
+# + DISABLE_STRONG_PASSWORD - Allows weaker passwords than the default policy
+# + DISABLE_PASSWORD_EXPIRATION - Disable expiration of the password
+# + BOTH_POLICIES - Both policies
+public enum PasswordPolicy {
+    DISABLE_STRONG_PASSWORD = "DisableStrongPassword",
+    DISABLE_PASSWORD_EXPIRATION = "DisablePasswordExpiration",
+    BOTH_POLICIES = "DisablePasswordExpiration, DisableStrongPassword"
+}
+
+# The dynamic membership processing state.
+# 
+# + ON - Membership procssing is `on`
+# + PAUSED - Membership procssing is `paused`
+public enum MembershipRuleProcessingState {
+    ON = "On",
+    PAUSED = "Paused"
+}
+
+# The group resources that are provisioned as part of Microsoft 365 group creation, that are not normally part of 
+# default group creation.
+# 
+# + TEAM - Provision this group as a team in Microsoft Teams
+public enum ResourceProvisionOption {
+    TEAM = "Team"
+}
+
+# Specifies a Microsoft 365 group's color theme.
+# 
+# + TEAL - Teal colour
+# + PURPLE - Purple colour
+# + PINK - Pink colour
+# + GREEN - Green colour
+# + BLUE - Blue colour
+# + ORANGE - Orange colour
+# + RED - Red colour
+public enum Theme {
+    TEAL = "Teal",
+    PURPLE = "Purple",
+    PINK = "Pink",
+    GREEN = "Green",
+    BLUE = "Blue",
+    ORANGE = "Orange",
+    RED = "Red"
+}
+
+# The group behaviors that can be set for a Microsoft 365 group during creation. 
+# 
+# + ALLOW_ONLY_MEMBERS_TO_POST - Only group members can post conversations to the group
+# + HIDE_GROUP_IN_OUTLOOK - This group is hidden in Outlook experiences 
+# + SUBSCRIBE_NEW_MEMBERS - Group members are subscribed to receive group conversations
+# + WELCOME_EMAIL_DISABLED - Welcome emails are not sent to new members
+public enum ResourceBehaviorOption {
+    ALLOW_ONLY_MEMBERS_TO_POST = "AllowOnlyMembersToPost",
+    HIDE_GROUP_IN_OUTLOOK = "HideGroupInOutlook",
+    SUBSCRIBE_NEW_MEMBERS = "SubscribeNewGroupMembers",
+    WELCOME_EMAIL_DISABLED = "WelcomeEmailDisabled"
+}
+
+# Specifies the group type and its membership.
+# 
+# + UNIFIED - The group is a Microsoft 365 group
+# + DYNAMIC_MEMBERSHIP - The group has dynamic membership
+public enum GroupType {
+    UNIFIED = "Unified",
+    DYNAMIC_MEMBERSHIP = "DynamicMembership"
+}
+
+# The type of permission.
+# 
+# + APPLICATION - Application permission
+# + DELEGATED - Delegated permission
+public enum PermissionType {
+    APPLICATION = "Application",
+    DELEGATED = "Delegated"
 }
 
 enum SystemQueryOption {

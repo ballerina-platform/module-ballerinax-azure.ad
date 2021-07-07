@@ -20,7 +20,7 @@ import ballerina/http;
 #
 # + clientConfig - OAuth client configuration
 # + secureSocketConfig - SSH configuration
-@display{label: "Connection config"} 
+@display{label: "Connection Config"} 
 public type Configuration record {|
     http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig clientConfig;
     http:ClientSecureSocket secureSocketConfig?;
@@ -55,8 +55,8 @@ public type Configuration record {|
 #                 directory. Maximum length is 64 characters. 
 # + mySite - The URL for the user's personal site  
 # + officeLocation - The office location in the user's place of business 
-# + otherMails - A list of additional email addresses for the user; 
-#                Example: ["bob@contoso.com", "Robert@fabrikam.com"].  
+# + otherMails - A list of additional email addresses for the user
+#                Example: ["bob@contoso.com", "Robert@fabrikam.com"] 
 # + passwordPolicies - Specifies password policies for the user  
 # + pastProjects - A list for the user to enumerate their past projects 
 # + postalCode - The postal code for the user's postal address  
@@ -67,9 +67,9 @@ public type Configuration record {|
 # + state - The state or province in the user's address. Maximum length is 128 characters 
 # + streetAddress - The street address of the user's place of business. Maximum length is 1024 characters  
 # + usageLocation - A two letter country code (ISO standard 3166). Required for users that will be assigned licenses
-#                   due to legal requirement to check for availability of services in countries. 
+#                   due to legal requirement to check for availability of services in countries
 #                   Examples: US, JP, and GB.   
-# + surname - The user's surname (family name or last name). Maximum length is 64 characters.  
+# + surname - The user's surname (family name or last name). Maximum length is 64 characters
 public type BaseUserData record {
     string? onPremisesImmutableId?;
     PasswordProfile? passwordProfile?;
@@ -93,7 +93,7 @@ public type BaseUserData record {
     string? mySite?;
     string? officeLocation?;
     string? otherMails?;
-    string? passwordPolicies?;//enum
+    PasswordPolicy? passwordPolicies?;
     string[] pastProjects?;
     string? postalCode?;
     string? preferredLanguage?;
@@ -102,7 +102,7 @@ public type BaseUserData record {
     string[] skills?;
     string? state?;
     string? streetAddress?;
-    string? usageLocation?;//enum
+    string? usageLocation?;
     string? surname?;
 };
 
@@ -221,11 +221,11 @@ public type BaseGroupData record {
     string[] members?;
     string? classification?;
     string? membershipRule?;
-    string? membershipRuleProcessingState?;//enum
-    string? preferredDataLocation?; //check
-    string? preferredLanguage?; //check
-    string[] resourceProvisioningOptions?;//enum
-    string? theme?; //enum
+    MembershipRuleProcessingState? membershipRuleProcessingState?;
+    string? preferredDataLocation?;
+    string? preferredLanguage?;
+    ResourceProvisionOption[] resourceProvisioningOptions?;
+    Theme? theme?;
 };
 
 # Represents a new group to be added to the Active AD.
@@ -240,12 +240,12 @@ public type BaseGroupData record {
 # + memberIds - Represents the members for the group at creation time 
 public type NewGroup record {
     *BaseGroupData;
-    string[] groupTypes;//enum[] https://docs.microsoft.com/en-us/graph/api/resources/groups-overview?view=graph-rest-1.0
+    GroupType[] groupTypes;
     string displayName;
     boolean mailEnabled;
     boolean securityEnabled;
     string mailNickname;
-    string[] resourceBehaviorOptions?; //enum
+    ResourceBehaviorOption[] resourceBehaviorOptions?;
     string[] ownerIds?;
     string[] memberIds?;
 };
@@ -264,7 +264,7 @@ public type NewGroup record {
 #                             notifications
 # + visibility - Specifies the group join policy and group content visibility for groups 
 public type UpdateGroup record {
-    string[] groupTypes?;//enum[] https://docs.microsoft.com/en-us/graph/api/resources/groups-overview?view=graph-rest-1.0
+    GroupType[] groupTypes?;
     string description?;
     string displayName?;
     boolean mailEnabled?;
@@ -309,7 +309,7 @@ public type UpdateGroup record {
 public type Group record {
     string id?;
     *BaseGroupData;
-    string[] resourceBehaviorOptions?; //enum
+    ResourceBehaviorOption[] resourceBehaviorOptions?;
     boolean? allowExternalSenders?;
     AssignedLabel[] assignedLabels?;
     AssignedLicense[] assignedLicenses?;
@@ -365,6 +365,6 @@ public type PermissionGrant record {
     string clientId?;
     string clientAppId?;
     string resourceAppId?;
-    string permissionType?; //enum
+    PermissionType permissionType?;
     string permission?;
 };
