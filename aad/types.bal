@@ -306,10 +306,11 @@ public type UpdateGroup record {
 # + onPremisesSyncEnabled - On premises sync enabled   
 # + proxyAddresses - Email addresses for the group that direct to the same group mailbox. 
 #                    Example: ["SMTP: bob@contoso.com", "smtp: bob@sales.contoso.com"] 
+# + mailEnabled - Specifies whether the group is mail-enabled
 public type Group record {
     string id?;
     *BaseGroupData;
-    ResourceBehaviorOption[] resourceBehaviorOptions?;
+    string[] resourceBehaviorOptions?;
     boolean? allowExternalSenders?;
     AssignedLabel[] assignedLabels?;
     AssignedLicense[] assignedLicenses?;
@@ -329,6 +330,7 @@ public type Group record {
     string? onPremisesSecurityIdentifier?;
     boolean? onPremisesSyncEnabled?;
     string[] proxyAddresses?;
+    boolean mailEnabled;
 };
 
 # Represents a sensitivity label assigned to an Microsoft 365 group.

@@ -43,4 +43,3 @@ public type Error PayloadValidationError|QueryParameterValidationError|InputVali
 const INVALID_RESPONSE = "Invalid response";
 const INVALID_PAYLOAD = "Invalid payload";
 const INVALID_QUERY_PARAMETER = "Invalid query parameter";
-
