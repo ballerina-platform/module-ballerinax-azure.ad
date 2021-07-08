@@ -1,4 +1,10 @@
-# Ballerina Azure Active Directory Connector
+Ballerina Azure Active Directory Connector
+===================
+
+[![Build Status](https://github.com/ballerina-platform/module-ballerinax-azure.ad/workflows/CI/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-msgraph-teams/actions?query=workflow%3ACI)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerinax-azure.ad.svg)](https://github.com/ballerina-platform/module-ballerinax-msgraph-teams/commits/master)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Azure Active Directory is Microsoft’s multi-tenant, cloud-based directory and identity management service which provides 
 capabilities to enable  Single Sign-On (SSO) ,multi-factor authentication, self-service password reset, privileged identity 
 management, role based access control etc to first and third-party Software as a Service (SaaS) applications.
@@ -17,7 +23,7 @@ performed using the v1.0 version of Microsoft Graph API. The client uses OAuth 2
        > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed
        JDK.
  
-2. Download and install [Ballerina SLBeta 1](https://ballerina.io/)
+2. Download and install [Ballerina](https://ballerina.io/)
 
 ### Building the Source
  
@@ -25,11 +31,11 @@ Execute the commands below to build from the source.
  
 1. To build the package:
    ```   
-   bal build -c
+   bal build -c ./aad
    ```
 2. To run the without tests:
    ```
-   bal build -c --skip-tests
+   bal build -c --skip-tests ./aad
    ```
 ## Contributing to Ballerina
  

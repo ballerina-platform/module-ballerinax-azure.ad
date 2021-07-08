@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-isolated function convertNewGroupToJson(NewGroup info) returns json|Error? {
+isolated function convertNewGroupToJson(NewGroup info) returns json|error? {
     json newGroup = check info.cloneWithType(json);
     string[] ownerIds = info?.ownerIds ?: [];
     string[] memberIds = info?.memberIds ?: [];

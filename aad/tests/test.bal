@@ -63,7 +63,7 @@ function testCreateUser() {
         surname: "Rasinga"
     };
 
-    User|Error user = aadClient->createUser(info);
+    User|error user = aadClient->createUser(info);
     if (user is User) {
         newUserId = user?.id.toString();
         log:printInfo("User created " + user?.id.toString());
@@ -82,7 +82,7 @@ function testGetUser() {
     runtime:sleep(2);
 
     string userId = newUserId;
-    User|Error user = aadClient->getUser(userId);
+    User|error user = aadClient->getUser(userId);
     if (user is User) {
         log:printInfo("User " + user.toString());
     } else {
@@ -100,9 +100,9 @@ function testGetUserWithQueryParams() {
     runtime:sleep(2);
 
     string userId = newUserId;
-    string[] params = ["$select=displayName,givenName,onPremisesExtensionAttributes,ageGroup,responsibilities"];
+    string params = "$select=displayName,givenName,onPremisesExtensionAttributes,ageGroup,responsibilities";
 
-    User|Error user = aadClient->getUser(userId, params);
+    User|error user = aadClient->getUser(userId, params);
     if (user is User) {
         log:printInfo("User " + user.toString());
     } else {
@@ -122,7 +122,7 @@ function testUpdateUser() {
     string userId = newUserId;
     UpdateUser info = {
     };
-    Error? userInfo = aadClient->updateUser(userId, info);
+    error? userInfo = aadClient->updateUser(userId, info);
     if (userInfo is ()) {
         log:printInfo("Sucessfully updated");
     } else {
@@ -139,9 +139,9 @@ function testListUsers() {
     log:printInfo("client->listUsers()");
     runtime:sleep(2);
 
-    stream<User,Error>|Error userStream = aadClient->listUsers();
-    if (userStream is stream<User,Error>) {
-        Error? e = userStream.forEach(isolated function (User item) {
+    stream<User,error?>|error userStream = aadClient->listUsers();
+    if (userStream is stream<User,error?>) {
+        error? e = userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -158,11 +158,11 @@ function testListUsersQueryParams() {
     log:printInfo("client->listUsersWithParams()");
     runtime:sleep(2);
 
-    string[] params = ["$count=true"];
+    string params = "$count=true";
 
-    stream<User,Error>|Error userStream = aadClient->listUsers(params);
-    if (userStream is stream<User,Error>) {
-        Error? e = userStream.forEach(isolated function (User item) {
+    stream<User,error?>|error userStream = aadClient->listUsers(params);
+    if (userStream is stream<User,error?>) {
+        error? e = userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -190,7 +190,7 @@ function testCreateGroup() {
         //memberIds: [newUserId]
     };
 
-    Group|Error group = aadClient->createGroup(info);
+    Group|error group = aadClient->createGroup(info);
     if (group is Group) {
         newGroupId = group?.id.toString();
         log:printInfo("Group created " + group?.id.toString());
@@ -210,7 +210,7 @@ function testGetGroup() {
 
     string groupId = newGroupId;
 
-    Group|Error group = aadClient->getGroup(groupId);
+    Group|error group = aadClient->getGroup(groupId);
     if (group is Group) {
         log:printInfo("Group " + group.toString());
     } else {
@@ -231,7 +231,7 @@ function testUpdateGroup() {
     UpdateGroup info = {
         mailNickname: string `grouprename${randomString}`
     };
-    Error? result = aadClient->updateGroup(groupId, info);
+    error? result = aadClient->updateGroup(groupId, info);
     if (result is ()) {
         log:printInfo("Sucessfully updated");
     } else {
@@ -247,9 +247,11 @@ function testListGroups() {
     log:printInfo("client->listGroups()");
     runtime:sleep(2);
 
-    stream<Group,Error>|Error groupStream = aadClient->listGroups();
-    if (groupStream is stream<Group,Error>) {
-        Error? e = groupStream.forEach(isolated function (Group item) {
+    string query = "$top=1";
+
+    stream<Group,error?>|error groupStream = aadClient->listGroups(query);
+    if (groupStream is stream<Group,error?>) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -268,7 +270,7 @@ function testRenewGroup() {
 
     string groupId = newGroupId;
 
-    Error? result = aadClient->renewGroup(groupId);
+    error? result = aadClient->renewGroup(groupId);
     if (result is ()) {
         log:printInfo("Sucessfully renewed");
     } else {
@@ -287,9 +289,9 @@ function testListParentGroups() { //test this for groups and users
 
     string groupId = newGroupId;
 
-    stream<Group,Error>|Error groupStream = aadClient->listParentGroups("group", groupId);
-    if (groupStream is stream<Group,Error>) {
-        Error? e = groupStream.forEach(isolated function (Group item) {
+    stream<Group,error?>|error groupStream = aadClient->listParentGroups("group", groupId);
+    if (groupStream is stream<Group,error?>) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -308,9 +310,9 @@ function testListTransitiveParentGroups() { //test this for groups and users
 
     string groupId = newGroupId;
 
-    stream<Group,Error>|Error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
-    if (groupStream is stream<Group,Error>) {
-        Error? e = groupStream.forEach(isolated function (Group item) {
+    stream<Group,error?>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
+    if (groupStream is stream<Group,error?>) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -330,7 +332,7 @@ function testAddMemberToGroup() {
     string groupId = newGroupId;
     string memberId = newUserId;
 
-    Error? result = aadClient->addGroupMember(groupId, memberId);
+    error? result = aadClient->addGroupMember(groupId, memberId);
     if (result is ()) {
         log:printInfo("Sucessfully added group member");
     } else {
@@ -349,9 +351,9 @@ function testListMembers() {
 
     string groupId = newGroupId;
 
-    stream<User,Error>|Error groupStream = aadClient->listGroupMembers(groupId);
-    if (groupStream is stream<User,Error>) {
-        Error? e = groupStream.forEach(isolated function (User item) {
+    stream<User,error?>|error groupStream = aadClient->listGroupMembers(groupId);
+    if (groupStream is stream<User,error?>) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -370,9 +372,9 @@ function testListTransitiveMembers() {
 
     string groupId = newGroupId;
 
-    stream<User,Error>|Error groupStream = aadClient->listTransitiveGroupMembers(groupId);
-    if (groupStream is stream<User,Error>) {
-        Error? e = groupStream.forEach(isolated function (User item) {
+    stream<User,error?>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
+    if (groupStream is stream<User,error?>) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -392,7 +394,7 @@ function testRemoveMember() {
     string groupId = newGroupId;
     string memberId = newUserId;
 
-    Error? result = aadClient->removeGroupMember(groupId, memberId);
+    error? result = aadClient->removeGroupMember(groupId, memberId);
     if (result is ()) {
         log:printInfo("Sucessfully removed");
     } else {
@@ -412,7 +414,7 @@ function testAddOwnerToGroup() {
     string groupId = newGroupId;
     string ownerId = newUserId;
 
-    Error? result = aadClient->addGroupOwner(groupId, ownerId);
+    error? result = aadClient->addGroupOwner(groupId, ownerId);
     if (result is ()) {
         log:printInfo("Sucessfully added group owner");
     } else {
@@ -431,9 +433,9 @@ function testListOwners() {
 
     string groupId = newGroupId;
 
-    stream<User,Error>|Error groupStream = aadClient->listGroupOwners(groupId);
-    if (groupStream is stream<User,Error>) {
-        Error? e = groupStream.forEach(isolated function (User item) {
+    stream<User,error?>|error groupStream = aadClient->listGroupOwners(groupId);
+    if (groupStream is stream<User,error?>) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -453,7 +455,7 @@ function testRemoveOwner() {
     string groupId = newGroupId;
     string ownerId = newUserId;
 
-    Error? result = aadClient->removeGroupOwner(groupId, ownerId);
+    error? result = aadClient->removeGroupOwner(groupId, ownerId);
     if (result is ()) {
         log:printInfo("Sucessfully deleted");
     } else {
@@ -472,9 +474,9 @@ function testListPermissionGrants() {
 
     string groupId = newGroupId;
 
-    stream<PermissionGrant,Error>|Error grantStream = aadClient->listPermissionGrants(groupId);
-    if (grantStream is stream<PermissionGrant,Error>) {
-        Error? e = grantStream.forEach(isolated function (PermissionGrant item) {
+    stream<PermissionGrant, error?>|error grantStream = aadClient->listPermissionGrants(groupId);
+    if (grantStream is stream<PermissionGrant, error?>) {
+        error? e = grantStream.forEach(isolated function (PermissionGrant item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -491,7 +493,7 @@ function testDeleteUserAndGroup() {
     string groupId = newGroupId;
 
     log:printInfo("client->deleteUser()");
-    Error? userDeleteResult = aadClient->deleteUser(userId);
+    error? userDeleteResult = aadClient->deleteUser(userId);
     if (userDeleteResult is ()) {
         log:printInfo("Sucessfully deleted the user");
     } else {
@@ -499,7 +501,7 @@ function testDeleteUserAndGroup() {
     }
 
     log:printInfo("client->deleteGroup()");
-    Error? groupDeleteResult = aadClient->deleteGroup(groupId);
+    error? groupDeleteResult = aadClient->deleteGroup(groupId);
     if (userDeleteResult is ()) {
         log:printInfo("Sucessfully deleted group");
     } else {

@@ -226,3 +226,10 @@ const TRANSITIVE_MEMBERS = "transitiveMembers";
 const OWNERS = "owners";
 const TRANSITIVE_MEMBER_OF = "transitiveMemberOf";
 const PERMISSION_GRANTS = "permissionGrants";
+const VALUE_ARRAY = "value";
+
+# error messages
+const INVALID_RESPONSE = "Invalid response";
+const INVALID_PAYLOAD = "Invalid payload";
+const INVALID_QUERY_PARAMETER = "Invalid query parameter";
+const NO_REQUIRED_MEMBERS = "Atleast one member should be added";

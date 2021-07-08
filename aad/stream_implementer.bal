@@ -22,22 +22,27 @@ class UserStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
+    Configuration config;
+    string? queryParams;
 
-    isolated function init(http:Client httpClient, string path) returns @tainted Error? {
+    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+                           returns error? {
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
+        self.config = config;
+        self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
 
-    public isolated function next() returns @tainted record {| User value; |}|Error? {
+    public isolated function next() returns record {| User value; |}|error? {
         if(self.index < self.currentEntries.length()) {
             record {| User value; |} singleRecord = {value: self.currentEntries[self.index]};
             self.index += 1;
             return singleRecord;
         }
         // This code block is for retrieving the next batch of records when the initial batch is finished.
-        if (self.nextLink != EMPTY_STRING) {
+        if (self.nextLink != EMPTY_STRING && !self.queryParams.toString().includes("$top")) {
             self.index = 0;
             self.currentEntries = check self.fetchRecordsNext();
             record {| User value; |} singleRecord = {value: self.currentEntries[self.index]};
@@ -46,35 +51,29 @@ class UserStream {
         }
     }
 
-    isolated function fetchRecordsInitial() returns @tainted User[]|Error {
+    isolated function fetchRecordsInitial() returns User[]|error {
         http:Response response = check self.httpClient->get(self.path);
         map<json>|string? handledResponse = check handleResponse(response);
         return check self.getAndConvertToUserArray(response);
     }
     
-    isolated function fetchRecordsNext() returns @tainted User[]|Error {
-        http:Client nextPageClient = check new (self.nextLink);
+    isolated function fetchRecordsNext() returns User[]|error {
+        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
+        http:Client nextPageClient = check new (self.nextLink, {
+            auth: self.config.clientConfig,
+            secureSocket: socketConfig
+        });
         http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToUserArray(response);
     }
 
-    isolated function getAndConvertToUserArray(http:Response response) returns @tainted User[]|Error {
-        User[] users = [];
+    isolated function getAndConvertToUserArray(http:Response response) returns User[]|error {
         map<json>|string? handledResponse = check handleResponse(response);
         if (handledResponse is map<json>) {
             self.nextLink = let var link = handledResponse["@odata.nextLink"] in link is string ? link : EMPTY_STRING;
-            json values = check handledResponse.value;
-            if (values is json[]) {
-                foreach json item in values {
-                    User convertedItem = check item.cloneWithType(User);
-                    users.push(convertedItem);
-                }
-                return users;
-            } else {
-                return error PayloadValidationError(INVALID_PAYLOAD);
-            }
+            return check handledResponse[VALUE_ARRAY].cloneWithType(UserArray);
         } else {
-            return error PayloadValidationError(INVALID_RESPONSE);
+            return error(INVALID_RESPONSE);
         }
     }
 }
@@ -85,22 +84,27 @@ class GroupStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
+    Configuration config;
+    string? queryParams;
 
-    isolated function init(http:Client httpClient, string path) returns @tainted Error? {
+    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+                           returns error? {
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
+        self.config = config;
+        self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
 
-    public isolated function next() returns @tainted record {| Group value; |}|Error? {
+    public isolated function next() returns record {| Group value; |}|error? {
         if(self.index < self.currentEntries.length()) {
             record {| Group value; |} singleRecord = {value: self.currentEntries[self.index]};
             self.index += 1;
             return singleRecord;
         }
         // This code block is for retrieving the next batch of records when the initial batch is finished.
-        if (self.nextLink != EMPTY_STRING) {
+        if (self.nextLink != EMPTY_STRING && !self.queryParams.toString().includes("$top")) {
             self.index = 0;
             self.currentEntries = check self.fetchRecordsNext();
             record {| Group value; |} singleRecord = {value: self.currentEntries[self.index]};
@@ -109,35 +113,28 @@ class GroupStream {
         }
     }
 
-    isolated function fetchRecordsInitial() returns @tainted Group[]|Error {
+    isolated function fetchRecordsInitial() returns Group[]|error {
         http:Response response = check self.httpClient->get(self.path);
         map<json>|string? handledResponse = check handleResponse(response);
         return check self.getAndConvertToGroupArray(response);
     }
     
-    isolated function fetchRecordsNext() returns @tainted Group[]|Error {
-        http:Client nextPageClient = check new (self.nextLink);
-        http:Response response = check nextPageClient->get(EMPTY_STRING);
+    isolated function fetchRecordsNext() returns Group[]|error {
+        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
+        http:Client nextPageClient = check new (self.nextLink, {
+            auth: self.config.clientConfig,
+            secureSocket: socketConfig
+        });        http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToGroupArray(response);
     }
 
-    isolated function getAndConvertToGroupArray(http:Response response) returns @tainted Group[]|Error {
-        Group[] groups = [];
+    isolated function getAndConvertToGroupArray(http:Response response) returns Group[]|error {
         map<json>|string? handledResponse = check handleResponse(response);
         if (handledResponse is map<json>) {
             self.nextLink = let var link = handledResponse["@odata.nextLink"] in link is string ? link : EMPTY_STRING;
-            json values = check handledResponse.value;
-            if (values is json[]) {
-                foreach json item in values {
-                    Group convertedItem = check item.cloneWithType(Group);
-                    groups.push(convertedItem);
-                }
-                return groups;
-            } else {
-                return error PayloadValidationError(INVALID_PAYLOAD);
-            }
+            return check handledResponse[VALUE_ARRAY].cloneWithType(GroupArray);
         } else {
-            return error PayloadValidationError(INVALID_RESPONSE);
+            return error(INVALID_RESPONSE);
         }
     }
 }
@@ -148,22 +145,27 @@ class PermissionGrantStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
+    Configuration config;
+    string? queryParams;
 
-    isolated function init(http:Client httpClient, string path) returns @tainted Error? {
+    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+                           returns error? {
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
+        self.config = config;
+        self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
 
-    public isolated function next() returns @tainted record {| PermissionGrant value; |}|Error? {
+    public isolated function next() returns record {| PermissionGrant value; |}|error? {
         if(self.index < self.currentEntries.length()) {
             record {| PermissionGrant value; |} singleRecord = {value: self.currentEntries[self.index]};
             self.index += 1;
             return singleRecord;
         }
         // This code block is for retrieving the next batch of records when the initial batch is finished.
-        if (self.nextLink != EMPTY_STRING) {
+        if (self.nextLink != EMPTY_STRING && !self.queryParams.toString().includes("$top")) {
             self.index = 0;
             self.currentEntries = check self.fetchRecordsNext();
             record {| PermissionGrant value; |} singleRecord = {value: self.currentEntries[self.index]};
@@ -172,36 +174,30 @@ class PermissionGrantStream {
         }
     }
 
-    isolated function fetchRecordsInitial() returns @tainted PermissionGrant[]|Error {
+    isolated function fetchRecordsInitial() returns PermissionGrant[]|error {
         http:Response response = check self.httpClient->get(self.path);
         map<json>|string? handledResponse = check handleResponse(response);
         return check self.getAndConvertToGrantArray(response);
     }
     
-    isolated function fetchRecordsNext() returns @tainted PermissionGrant[]|Error {
-        http:Client nextPageClient = check new (self.nextLink);
+    isolated function fetchRecordsNext() returns PermissionGrant[]|error {
+        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
+        http:Client nextPageClient = check new (self.nextLink, {
+            auth: self.config.clientConfig,
+            secureSocket: socketConfig
+        });         
         http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToGrantArray(response);
     }
 
-    isolated function getAndConvertToGrantArray(http:Response response) returns @tainted PermissionGrant[]|Error {
-        PermissionGrant[] grants = [];
+    isolated function getAndConvertToGrantArray(http:Response response) returns PermissionGrant[]|error {
         map<json>|string? handledResponse = check handleResponse(response);
         if (handledResponse is map<json>) {
             self.nextLink = let var link = handledResponse["@odata.nextLink"] in link is string ? link : EMPTY_STRING;
-            json values = check handledResponse.value;
-            if (values is json[]) {
-                foreach json item in values {
-                    PermissionGrant convertedItem = check item.cloneWithType(PermissionGrant);
-                    grants.push(convertedItem);
-                }
-                return grants;
-            }  else {
-                return error PayloadValidationError(INVALID_PAYLOAD);
-            }
+            return check handledResponse[VALUE_ARRAY].cloneWithType(PermissionGrantArray);
         } 
         else {
-            return error PayloadValidationError(INVALID_RESPONSE);
+            return error(INVALID_RESPONSE);
         }
     }
 }

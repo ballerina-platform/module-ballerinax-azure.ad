@@ -370,3 +370,7 @@ public type PermissionGrant record {
     PermissionType permissionType?;
     string permission?;
 };
+
+type UserArray User[];
+type GroupArray Group[];
+type PermissionGrantArray PermissionGrant[];

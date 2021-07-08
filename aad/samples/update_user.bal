@@ -15,13 +15,12 @@
 // under the License.
 
 import ballerina/log;
-import ballerina/os;
 import ballerinax/azure.ad;
 
-configurable string & readonly refreshUrl = os:getEnv("REFRESH_URL");
-configurable string & readonly refreshToken = os:getEnv("REFRESH_TOKEN");
-configurable string & readonly clientId = os:getEnv("CLIENT_ID");
-configurable string & readonly clientSecret = os:getEnv("CLIENT_SECRET");
+configurable string & readonly refreshUrl = ?;
+configurable string & readonly refreshToken = ?;
+configurable string & readonly clientId = ?;
+configurable string & readonly clientSecret = ?;
 
 public function main() returns error? {
     ad:Configuration configuration = {
@@ -40,7 +39,7 @@ public function main() returns error? {
         displayName: "<UPDATED_DISPLAY_NAME>",
         department: "<DEPARTMENT>"
     };
-    ad:Error? userInfo = aadClient->updateUser(userId, info);
+    error? userInfo = aadClient->updateUser(userId, info);
     if (userInfo is ()) {
         log:printInfo("Sucessfully updated");
     } else {

@@ -15,13 +15,12 @@
 // under the License.
 
 import ballerina/log;
-import ballerina/os;
 import ballerinax/azure.ad;
 
-configurable string & readonly refreshUrl = os:getEnv("REFRESH_URL");
-configurable string & readonly refreshToken = os:getEnv("REFRESH_TOKEN");
-configurable string & readonly clientId = os:getEnv("CLIENT_ID");
-configurable string & readonly clientSecret = os:getEnv("CLIENT_SECRET");
+configurable string & readonly refreshUrl = ?;
+configurable string & readonly refreshToken = ?;
+configurable string & readonly clientId = ?;
+configurable string & readonly clientSecret = ?;
 
 public function main() returns error? {
     ad:Configuration configuration = {
@@ -38,7 +37,7 @@ public function main() returns error? {
     string groupId = "<GROUP_ID>";
     string memberId = "<USER_ID>";
 
-    ad:Error? result = aadClient->removeGroupMember(groupId, memberId);
+    error? result = aadClient->removeGroupMember(groupId, memberId);
     if (result is ()) {
         log:printInfo("Sucessfully removed");
     } else {

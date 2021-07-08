@@ -16,7 +16,7 @@
 
 import ballerina/http;
 
-isolated function handleResponse(http:Response httpResponse) returns @tainted map<json>|Error {
+isolated function handleResponse(http:Response httpResponse) returns map<json>|error {
     if (httpResponse.statusCode is http:STATUS_OK|http:STATUS_CREATED|http:STATUS_ACCEPTED) {
         json jsonResponse = check httpResponse.getJsonPayload();
         return <map<json>>jsonResponse;
@@ -25,10 +25,10 @@ isolated function handleResponse(http:Response httpResponse) returns @tainted ma
     }
     json errorPayload = check httpResponse.getJsonPayload();
     string message = errorPayload.toString();
-    return error PayloadValidationError(message);
+    return error(message);
 }
 
-isolated function createUrl(string[] pathParameters, string[] queryParameters = []) returns string|error {
+isolated function createUrl(string[] pathParameters, string? queryParameters = ()) returns string|error {
     string url = EMPTY_STRING;
     if (pathParameters.length() > ZERO) {
         foreach string element in pathParameters {
@@ -38,16 +38,13 @@ isolated function createUrl(string[] pathParameters, string[] queryParameters = 
             url += element;
         }
     }
-    if (queryParameters.length() > ZERO) {
-        url = url + check appendQueryOption(queryParameters[ZERO], QUESTION_MARK);
-        foreach string element in queryParameters.slice(1, queryParameters.length()) {
-            url += check appendQueryOption(element, AMPERSAND);
-        }
+    if (queryParameters is string) {
+        url = url + QUESTION_MARK + queryParameters;
     }
     return url;
 }
 
-isolated function appendQueryOption(string queryParameter, string connectingString) returns string|Error {
+isolated function appendQueryOption(string queryParameter, string connectingString) returns string|error {
     string url = EMPTY_STRING;
     int? indexOfEqual = queryParameter.indexOf(EQUAL_SIGN);
     if (indexOfEqual is int) {
@@ -57,14 +54,14 @@ isolated function appendQueryOption(string queryParameter, string connectingStri
             if (validateOdataSystemQueryOption(queryOptionName.substring(1), queryOptionValue)) {
                 url += connectingString + queryParameter;
             } else {
-                return error QueryParameterValidationError(INVALID_QUERY_PARAMETER);
+                return error(INVALID_QUERY_PARAMETER);
             }
         } else {
             // non odata query parameters
             url += connectingString + queryParameter;
         }
     } else {
-        return error QueryParameterValidationError(INVALID_QUERY_PARAMETER);
+        return error(INVALID_QUERY_PARAMETER);
     }
     return url;
 }

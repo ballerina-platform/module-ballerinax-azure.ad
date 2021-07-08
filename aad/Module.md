@@ -6,17 +6,17 @@ easily. It provides capability to perform management operations on `User` and `G
 The connector is developed on top of Microsoft Graph is a REST web API that empowers you to access Microsoft Cloud 
 service resources. This version of the connector only supports the operations on users and groups of an Azure AD
  
-This module supports **Ballerina SL Beta 1**  version.
- 
+This module supports [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview) v1.0 version. 
+## Configuring connector
+### Prerequisites
+- Microsoft Office365 Work or School account
+- Access to register an application in Azure portal
 ## Obtaining tokens
-Follow the following steps below to obtain the configurations.
-
-1. Before you run the following steps, you must have access to Azure Portal. Next, sign into [Azure Portal - App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade). You should use your  work or school account to register.
+1. Sign into [Azure Portal - App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade). You should use your work or school account to register.
 
 2. In the App registrations page, click **New registration** and enter a meaningful name in the name field.
 
-3. In the **Supported account types** section, select **Accounts** in this organizational directory only (Single tenent). 
-Click **Register** to create the application.
+3. In the **Supported account types** section, select **Accounts in this organizational directory only (Single-tenant)** or **Accounts in any organizational directory (Any Azure AD directory - Multi-tenant)**. Click **Register** to create the application.
     
 4. Copy the Application (client) ID (`<CLIENT_ID>`). This is the unique identifier for your app.
     
@@ -29,53 +29,53 @@ Click **Register** to create the application.
    Under **Implicit grant**, select **Access tokens**.
    Click **Configure**.
 
-8. Under **Certificates & Secrets**, create a new client secret (`<CLIENT_SECRET>`). This requires providing a 
-description and a period of expiry. Next, click **Add**.
+8. Under **Certificates & Secrets**, create a new client secret (`<CLIENT_SECRET>`). This requires providing a description and a period of expiry. Next, click **Add**.
 
 9. Next, you need to obtain an access token and a refresh token to invoke the Microsoft Graph API.
-First, in a new browser, enter the below URL by replacing the `<CLIENT_ID>` with the application ID. Here you can use 
-`Files.ReadWrite` or `Files.ReadWrite.All` according to your preference. `Files.ReadWrite` will allow you to access to 
-only your files and `Files.ReadWrite.All` will allow you to access all files you can access.
+    - First, in a new browser, enter the below URL by replacing the `<CLIENT_ID>` with the application ID. 
+
+    - Here you need to provide a space seperated list of necessary scope names for `<SCOPES>`. The necessary scopes for this
+    version of the connector are `Group.ReadWrite.All` and `User.ReadWrite.All`.
 
     ```
-    https://login.microsoftonline.com/<TENET_ID>/oauth2/v2.0/authorize?response_type=code&client_id=<CLIENT_ID>&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&scope=Group.ReadWrite.All 
-User.ReadWrite.All offline_access
+    https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=<CLIENT_ID>&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&scope=<SCOPES> offline_access
     ```
 
 10. This will prompt you to enter the username and password for signing into the Azure Portal App.
 
-11. Once the username and password pair is successfully entered, this will give a URL as follows on the browser address 
-bar.
-
-    `https://login.microsoftonline.com/<TENET_ID>/oauth2/nativeclient?code=xxxxxxxxxxxxxxxxxxxxxxxxxxx`
-
-12. Copy the code parameter (`xxxxxxxxxxxxxxxxxxxxxxxxxxx` in the above example) and in a new terminal, enter the 
-following cURL command by replacing the `<CODE>` with the code received from the above step. The `<CLIENT_ID>` and 
-`<CLIENT_SECRET>` parameters are the same as above.
+11. Once the username and password pair is successfully entered, this will give a URL as follows on the browser address bar.
 
     ```
-    curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --header "Host:login.microsoftonline.com" -d "client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&grant_type=authorization_code&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&code=<CODE>&scope=Group.ReadWrite.All User.ReadWrite.All offline_access" https://login.microsoftonline.com/common/oauth2/v2.0/token
+    https://login.microsoftonline.com/common/oauth2/nativeclient?code=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    ```
+
+12. Copy the code parameter (`xxxxxxxxxxxxxxxxxxxxxxxxxxx` in the above example) and in a new terminal, enter the following cURL command by replacing the `<CODE>` with the code received from the above step. The `<CLIENT_ID>` and `<CLIENT_SECRET>` parameters are the same as above.
+
+    ```
+    curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --header "Host:login.microsoftonline.com" -d "client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&grant_type=authorization_code&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient&code=<CODE>&scope=<SCOPES> offline_access" https://login.microsoftonline.com/common/oauth2/v2.0/token
     ```
 
     The above cURL command should result in a response as follows.
     ```
     {
       "token_type": "Bearer",
-      "scope": "Files.ReadWrite",
+      "scope": openid <LIST_OF_SCOPES>",
       "expires_in": 3600,
       "ext_expires_in": 3600,
       "access_token": "<ACCESS_TOKEN>",
-      "refresh_token": "<REFRESH_TOKEN>",
+      "refresh_token": "<REFRESH_TOKEN>"
     }
     ```
 
-13. Provide the following configuration information in the `Config.toml` file to use the Microsoft Excel connector.
+13. Provide the following configuration information in the `Config.toml` file to use the Azure AD connector.
 
     ```ballerina
-    clientId = <CLIENT_ID>
-    clientSecret = <CLIENT_SECRET>
-    refreshUrl = <REFRESH_URL>
-    refreshToken = <REFRESH_TOKEN>
+    [ballerinax.azure.ad]
+    refreshUrl = <MS_REFRESH_URL>
+    refreshToken = <MS_REFRESH_TOKEN>
+    clientId = <MS_CLIENT_ID>
+    clientSecret = <MS_CLIENT_SECRET>
+    ```
     ```
 
 ## Quickstart
@@ -93,8 +93,7 @@ aad:Configuration configuration = {
         refreshUrl: <REFRESH_URL>,
         refreshToken : <REFRESH_TOKEN>,
         clientId : <CLIENT_ID>,
-        clientSecret : <CLIENT_SECRET>,
-        scopes: [<NECESSARY_SCOPES>]
+        clientSecret : <CLIENT_SECRET>
     }
 };
 ```
@@ -116,7 +115,7 @@ aad:Client aadClient = check new (config);
         surname: "<SURNAME>"
     };
 
-    ad:User|ad:Error userInfo = aadClient->createUser(info);
+    ad:User|error userInfo = aadClient->createUser(info);
     if (userInfo is ad:User) {
         log:printInfo("User succesfully created " + userInfo?.id.toString());
     } else {
@@ -138,8 +137,7 @@ aad:Configuration configuration = {
         refreshUrl: <REFRESH_URL>,
         refreshToken : <REFRESH_TOKEN>,
         clientId : <CLIENT_ID>,
-        clientSecret : <CLIENT_SECRET>,
-        scopes: [<NECESSARY_SCOPES>]
+        clientSecret : <CLIENT_SECRET>
     }
 };
 ```
@@ -152,7 +150,7 @@ aad:Client aadClient = check new (config);
     string groupId = "<GROUP_ID>";
     string memberId = "<USER_ID>";
 
-    ad:Error? result = aadClient->addGroupMember(groupId, memberId);
+    error? result = aadClient->addGroupMember(groupId, memberId);
     if (result is ()) {
         log:printInfo("Sucessfully added group member");
     } else {

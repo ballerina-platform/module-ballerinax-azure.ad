@@ -1,4 +1,4 @@
-// Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -25,14 +25,20 @@ import ballerina/http;
 }
 public client class Client {
     http:Client httpClient;
+    Configuration config;
 
-    public isolated function init(Configuration config) returns error? {
-        http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig clientConfig = config.clientConfig;
-        http:ClientSecureSocket? socketConfig = config?.secureSocketConfig;
+    # Initializes the Azure AD connector client endpoint.
+    #
+    # + aadConfig - Configurations required to initialize the `Client` endpoint
+    # + return -  Error at failure of client initialization
+    public isolated function init(Configuration aadConfig) returns error? {
+        http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig clientConfig = aadConfig.clientConfig;
+        http:ClientSecureSocket? socketConfig = aadConfig?.secureSocketConfig;
         self.httpClient = check new (BASE_URL, {
             auth: clientConfig,
             secureSocket: socketConfig
         });
+        self.config = aadConfig;
     }
 
     // ************************************* Operations on a User resource *********************************************
@@ -41,10 +47,10 @@ public client class Client {
     # Create a new user.
     # 
     # + info - The basic information about a user
-    # + return - A record of type `User` if sucess. Else `Error`.
+    # + return - A record of type `User` if sucess. Else `error`.
     @display {label: "Create User"}
     remote isolated function createUser(@display {label: "New User Information"} NewUser info) returns 
-                                        @tainted User|Error {
+                                        User|error {
         string path = check createUrl([USERS]);
         json payload = check info.cloneWithType(json);
         return check self.httpClient->post(path, payload, targetType = User);
@@ -53,15 +59,16 @@ public client class Client {
     # Get information about a user.
     # 
     # + userId - The object ID if the user
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A record of type `User` if sucess. Else `Error`.
+    # + return - A record of type `User` if sucess. Else `error`.
     @display {label: "Get User"}
     remote isolated function getUser(@display {label: "User ID"} string userId, 
-                                     @display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                     returns @tainted User|error {
+                                     @display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                     returns User|error {
         string path = check createUrl([USERS, userId], queryParams);   
         return check self.httpClient->get(path, targetType = User);
     }
@@ -70,11 +77,11 @@ public client class Client {
     # 
     # + userId - The object ID if the user
     # + info - The information to update
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Update User"}
     remote isolated function updateUser(@display {label: "User ID"} string userId, 
                                         @display {label: "User Update Information"} UpdateUser info) 
-                                        returns @tainted Error? {
+                                        returns error? {
         string path = check createUrl([USERS, userId]); 
         json payload = check info.cloneWithType(json);   
         http:Response response = check self.httpClient->patch(path, payload);
@@ -83,29 +90,30 @@ public client class Client {
 
     # List information about users.
     # 
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `User` if sucess. Else `Error`.
+    # + return - A stream of type `User` if sucess. Else `error`.
     @display {label: "List Users"}
-    remote isolated function listUsers(@display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                       returns @tainted stream<User, Error>|Error {
+    remote isolated function listUsers(@display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                       returns @display {label: "Stream of User records"} stream<User, error?>|error {
         string path = check createUrl([USERS], queryParams);
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        UserStream objectInstance = check new (self.httpClient, path);
-        stream<User, Error> finalStream = new (objectInstance);
+        UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
     # Delete a user
     # 
     # + userId - The object ID if the user
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Delete User"}
-    remote isolated function deleteUser(@display {label: "User ID"} string userId) returns @tainted Error? {
+    remote isolated function deleteUser(@display {label: "User ID"} string userId) returns error? {
         string path = check createUrl([USERS, userId]); 
         http:Response response = check self.httpClient->delete(path);
         _ = check handleResponse(response);    
@@ -117,10 +125,10 @@ public client class Client {
     # Create a new group.
     # 
     # + info - The basic information about a group
-    # + return - A record of type `Group` if sucess. Else `Error`.
+    # + return - A record of type `Group` if sucess. Else `error`.
     @display {label: "Create Group"}
     remote isolated function createGroup(@display {label: "New Group Information"} NewGroup info) 
-                                         returns @tainted Group|Error {
+                                         returns Group|error {
         string path = check createUrl([GROUPS]);
         json payload = check convertNewGroupToJson(info);
         return check self.httpClient->post(path, payload, targetType = Group);
@@ -129,15 +137,16 @@ public client class Client {
     # Get information about a group.
     # 
     # + groupId - The object ID if the group
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A record of type `User` if sucess. Else `Error`.
+    # + return - A record of type `User` if sucess. Else `error`.
     @display {label: "Get Group"}
     remote isolated function getGroup(@display {label: "Group ID"} string groupId, 
-                                      @display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                      returns @tainted Group|error {
+                                      @display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                      returns Group|error {
         string path = check createUrl([GROUPS, groupId], queryParams);   
         return check self.httpClient->get(path, targetType = Group);
     }
@@ -146,11 +155,11 @@ public client class Client {
     # 
     # + groupId - The object ID if the group
     # + info - The information to update
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Update Group"}
     remote isolated function updateGroup(@display {label: "Group ID"} string groupId, 
                                          @display {label: "Group Update Information"}  UpdateGroup info) 
-                                         returns @tainted Error? {
+                                         returns error? {
         string path = check createUrl([GROUPS, groupId]); 
         json payload = check info.cloneWithType(json); 
         http:Response response = check self.httpClient->patch(path, payload);
@@ -160,29 +169,31 @@ public client class Client {
 
     # List information about groups.
     # 
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `User` if sucess. Else `Error`.
+    # + return - A stream of type `User` if sucess. Else `error`.
     @display {label: "List Groups"}
-    remote isolated function listGroups(@display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                        returns @tainted stream<Group, Error>|Error {
+    remote isolated function listGroups(@display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                        returns @display {label: "Stream of Group records"} 
+                                        stream<Group, error?>|error {
         string path = check createUrl([GROUPS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        GroupStream objectInstance = check new (self.httpClient, path);
-        stream<Group, Error> finalStream = new (objectInstance);
+        GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
     # Delete a group
     # 
     # + groupId - The object ID if the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Delete Group"}
-    remote isolated function deleteGroup(@display {label: "Group ID"} string groupId) returns @tainted Error? {
+    remote isolated function deleteGroup(@display {label: "Group ID"} string groupId) returns error? {
         string path = check createUrl([GROUPS, groupId]); 
         http:Response response = check self.httpClient->delete(path);
         _ = check handleResponse(response);
@@ -193,9 +204,9 @@ public client class Client {
     # defined in the policy.
     # 
     # + groupId - The object ID if the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Renew Group"}
-    remote isolated function renewGroup(@display {label: "Group ID"} string groupId) returns @tainted Error? {
+    remote isolated function renewGroup(@display {label: "Group ID"} string groupId) returns error? {
         string path = check createUrl([GROUPS, groupId, "renew"]); 
         http:Response response = check self.httpClient->post(path, {});
         _ = check handleResponse(response);    
@@ -205,16 +216,18 @@ public client class Client {
     # 
     # +'type - The type of directiry object
     # + objectId - The object ID
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `Group` if sucess. Else `Error`.
+    # + return - A stream of type `Group` if sucess. Else `error`.
     @display {label: "List Parent Groups"}
     remote isolated function listParentGroups(@display {label: "Directory Object Type"} DirctoryObject 'type, 
                                               @display {label: "Object ID"} string objectId, 
-                                              @display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                              returns @tainted stream<Group, Error>|Error {
+                                              @display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                              returns @display {label: "Stream of Group records"} 
+                                              stream<Group, error?>|error {
         string path = EMPTY_STRING;
         if('type == USER) {
             path = check createUrl([USERS, objectId, MEMBER_OF], queryParams);   
@@ -224,8 +237,8 @@ public client class Client {
         
         http:Response response = check self.httpClient->get(path);
         map<json>|string handledResponse = check handleResponse(response);
-        GroupStream objectInstance = check new (self.httpClient, path);
-        stream<Group, Error> finalStream = new (objectInstance);
+        GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
@@ -234,19 +247,21 @@ public client class Client {
     # 
     # +'type - The type of directiry object
     # + objectId - The object ID
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `Group` if sucess. Else `Error`.
+    # + return - A stream of type `Group` if sucess. Else `error`.
     @display {label: "List Transitive Parent Groups"}
     remote isolated function listTransitiveParentGroups(@display {label: "Directory Object Type"} DirctoryObject 'type, 
                                                         @display {label: "Object ID"} string objectId, 
                                                         @display {label: "Optional Query Parameters"} 
-                                                        string[] queryParams = []) returns 
-                                                        @tainted stream<Group, Error>|Error {
+                                                        string? queryParams = ()) returns 
+                                                        @display {label: "Stream of Group records"} 
+                                                        stream<Group, error?>|error {
         string path = EMPTY_STRING;
-        if('type == "user") {
+        if('type == USER) {
             path = check createUrl([USERS, objectId, TRANSITIVE_MEMBER_OF], queryParams);   
         } else {
             path = check createUrl([GROUPS, objectId, TRANSITIVE_MEMBER_OF], queryParams);   
@@ -254,8 +269,8 @@ public client class Client {
         
         http:Response response = check self.httpClient->get(path);
         map<json>|string handledResponse = check handleResponse(response);
-        GroupStream objectInstance = check new (self.httpClient, path);
-        stream<Group, Error> finalStream = new (objectInstance);
+        GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
@@ -263,10 +278,10 @@ public client class Client {
     # 
     # + groupId - The object ID if the group
     # + memberIds - The object IDs of members to add to the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Add Group Member"}
     remote isolated function addGroupMember(@display {label: "Group ID"} string groupId, 
-                                            @display {label: "Member IDs"} string... memberIds) returns @tainted Error? {
+                                            @display {label: "Member IDs"} string... memberIds) returns error? {
         string path = check createUrl([GROUPS, groupId, MEMBERS, "$ref"]); 
         json payload = {};
         if(memberIds.length() > 1) {
@@ -282,7 +297,7 @@ public client class Client {
                 "@odata.id": string `https://graph.microsoft.com/v1.0/directoryObjects/${memberIds[0]}`
             };
         } else {
-            return error InputValidationError("Atleast one member should be added");
+            return error("Atleast one member should be added");
         }
 
         http:Response response = check self.httpClient->post(path, payload);
@@ -292,43 +307,47 @@ public client class Client {
     # Get a list of the group's direct members.
     # 
     # + groupId - The object ID if the group
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `User` if sucess. Else `Error`.
+    # + return - A stream of type `User` if sucess. Else `error`.
     @display {label: "List Group Members"}
     remote isolated function listGroupMembers(@display {label: "Group ID"} string groupId, 
-                                              @display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                              returns @tainted stream<User, Error>|Error {
+                                              @display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                              returns @display {label: "Stream of User records"} 
+                                              stream<User, error?>|error {
         string path = check createUrl([GROUPS, groupId, MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        UserStream objectInstance = check new (self.httpClient, path);
-        stream<User, Error> finalStream = new (objectInstance);
+        UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
     # Get a list of the group's members.
     # 
     # + groupId - The object ID if the group
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `User` if sucess. Else `Error`.
+    # + return - A stream of type `User` if sucess. Else `error`.
     @display {label: "List Transitive Group Members"}
     remote isolated function listTransitiveGroupMembers(@display {label: "Group ID"} string groupId, 
                                                         @display {label: "Optional Query Parameters"} 
-                                                        string[] queryParams = []) returns 
-                                                        @tainted stream<User, Error>|Error {
+                                                        string? queryParams = ()) returns 
+                                                        @display {label: "Stream of User records"} 
+                                                        stream<User, error?>|error {
         string path = check createUrl([GROUPS, groupId, TRANSITIVE_MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        UserStream objectInstance = check new (self.httpClient, path);
-        stream<User, Error> finalStream = new (objectInstance);
+        UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
@@ -336,10 +355,10 @@ public client class Client {
     # 
     # + groupId - The object ID if the group
     # + memberId - The object ID of member to remove from the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Remove Group Member"}
     remote isolated function removeGroupMember(@display {label: "Group ID"} string groupId, 
-                                               @display {label: "Member ID"} string memberId) returns @tainted Error? {
+                                               @display {label: "Member ID"} string memberId) returns error? {
         string path = check createUrl([GROUPS, groupId, MEMBERS, memberId, "$ref"]); 
         http:Response response = check self.httpClient->delete(path);
         _ = check handleResponse(response);        
@@ -350,10 +369,10 @@ public client class Client {
     # 
     # + groupId - The object ID if the group
     # + ownerId - The object ID of owner to add to the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Add Group Owner"}
     remote isolated function addGroupOwner(@display {label: "Group ID"} string groupId, 
-                                           @display {label: "Owner ID"} string ownerId) returns @tainted Error? {
+                                           @display {label: "Owner ID"} string ownerId) returns error? {
         string path = check createUrl([GROUPS, groupId, OWNERS, "$ref"]); 
         json payload = {
                 "@odata.id": string `https://graph.microsoft.com/v1.0/users/${ownerId}`
@@ -366,21 +385,22 @@ public client class Client {
     # Retrieve a list of the group's owners.
     # 
     # + groupId - The object ID if the group
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `User` if sucess. Else `Error`.
+    # + return - A stream of type `User` if sucess. Else `error`.
     @display {label: "List Group Owners"}
     remote isolated function listGroupOwners(@display {label: "Group ID"} string groupId, 
-                                             @display {label: "Optional Query Parameters"} string[] queryParams = []) 
-                                             returns @tainted stream<User, Error>|Error {
+                                             @display {label: "Optional Query Parameters"} string? queryParams = ()) 
+                                             returns @display {label: "Stream of User records"} stream<User, error?>|error {
         string path = check createUrl([GROUPS, groupId, OWNERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        UserStream objectInstance = check new (self.httpClient, path);
-        stream<User, Error> finalStream = new (objectInstance);
+        UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
     }
 
@@ -388,10 +408,10 @@ public client class Client {
     # 
     # + groupId - The object ID if the group
     # + ownerId - The object ID of owner to remove from the group
-    # + return - `nil` if sucess. Else `Error`.
+    # + return - `nil` if sucess. Else `error`.
     @display {label: "Remove Group Owner"}
     remote isolated function removeGroupOwner(@display {label: "Group ID"} string groupId, 
-                                              @display {label: "Owner ID"} string ownerId) returns @tainted Error? {
+                                              @display {label: "Owner ID"} string ownerId) returns error? {
         string path = check createUrl([GROUPS, groupId, OWNERS, ownerId, "$ref"]); 
         
         http:Response response = check self.httpClient->delete(path);
@@ -402,22 +422,24 @@ public client class Client {
     # to the group, along with the corresponding kind of resource-specific access that each app has.
     # 
     # + groupId - The object ID if the group
-    # + queryParams - Optional query parameters. This method support OData query parameters to customize the response.
-    #                 It should be an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
-    #                 **Note:** For more information about query parameters, refer here: 
+    # + queryParams - Optional query parameters. 
+    #               - This method support OData query parameters to customize the response. It should be 
+    #                   an array of type `string` in the format `<QUERY_PARAMETER_NAME>=<PARAMETER_VALUE>`
+    #               - For more information about query parameters, refer here: 
     #                   https://docs.microsoft.com/en-us/graph/query-parameters
-    # + return - A stream of type `PermissionGrant` if sucess. Else `Error`.
+    # + return - A stream of type `PermissionGrant` if sucess. Else `error`.
     @display {label: "List Permission Grants"}
     remote isolated function listPermissionGrants(@display {label: "Group ID"} string groupId, 
                                                   @display {label: "Optional Query Parameters"} 
-                                                  string[] queryParams = []) returns 
-                                                  @tainted stream<PermissionGrant, Error>|Error {
+                                                  string? queryParams = ()) returns 
+                                                  @display {label: "Stream of Permission records"} 
+                                                  stream<PermissionGrant, error?>|error {
         string path = check createUrl([GROUPS, groupId, PERMISSION_GRANTS]);   
         http:Response response = check self.httpClient->get(path);
 
         map<json>|string handledResponse = check handleResponse(response);
-        PermissionGrantStream objectInstance = check new (self.httpClient, path);
-        stream<PermissionGrant, Error> finalStream = new (objectInstance);
+        PermissionGrantStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
+        stream<PermissionGrant, error?> finalStream = new (objectInstance);
         return finalStream; 
     } 
 }
