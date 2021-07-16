@@ -1,4 +1,20 @@
-target
-ballerina-internal.log
-.idea
-.vscode
+# Target folder of ballerina project
+/target
+
+# resources folder
+/resources
+
+# idea files
+*.idea
+
+# .ballerina files
+*.ballerina
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+#
+*.log
