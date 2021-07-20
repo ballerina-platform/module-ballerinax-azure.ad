@@ -40,7 +40,7 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                   args:
-                      build -c ./aad
+                      build -c --skip-tests ./aad
               env:
                 JAVA_HOME: /usr/lib/jvm/default-jvm
                 REFRESH_URL: ${{ secrets.REFRESH_URL }}

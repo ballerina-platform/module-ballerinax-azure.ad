@@ -13,7 +13,7 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                   args:
-                      build -c ./aad
+                      build -c --skip-tests ./aad
               env:
                   REFRESH_URL: ${{ secrets.REFRESH_URL }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
