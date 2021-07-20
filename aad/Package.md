@@ -7,7 +7,7 @@ This package provides the capability to easily access Azure AD.
 #### Compatibility
 |                               | Version                       |
 |-------------------------------|-------------------------------|
-| Ballerina Language Version    | **Swan Lake Beta2**           |
+| Ballerina Language Version    | **Swan Lake Alpha5**           |
 | API Version                   | **Microsoft Graph API v1.0**  |
 
 
