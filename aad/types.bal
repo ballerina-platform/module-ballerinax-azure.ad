@@ -16,7 +16,7 @@
 
 import ballerina/http;
 
-# Represents configuration parameters to create Azure AD client.
+# Configuration parameters to create Azure AD client.
 #
 # + clientConfig - OAuth client configuration
 # + secureSocketConfig - SSH configuration
@@ -26,7 +26,7 @@ public type Configuration record {|
     http:ClientSecureSocket secureSocketConfig?;
 |};
 
-# Represents common Azure AD user account information. 
+# Common Azure AD user account information. 
 #
 # + onPremisesImmutableId - This property is used to associate an on-premise active directory user account to its Azure 
 #                           AD user object
@@ -118,7 +118,7 @@ public type PasswordProfile record {|
     string password;
 |};
 
-# Represents a new user to be added to the Active AD.
+# New user to be added to the Active AD.
 # 
 # + accountEnabled - True if the account is enabled or else false
 # + mailNickname - The mail alias for the user
@@ -132,7 +132,7 @@ public type NewUser record {
     *BaseUserData;
 };
 
-# Represents updatable Azure AD user account information.
+# Updatable Azure AD user account information.
 #
 # + accountEnabled - True if the account is enabled or else false
 # + mailNickname - The mail alias for the user
@@ -146,7 +146,7 @@ public type UpdateUser record {
     *BaseUserData;
 };
 
-# Represents an Azure AD user account.
+# Azure AD user account.
 #
 # + id - The unique identifier for the user  
 # + displayName -  	The name displayed in the address book for the user. Maximum length is 256 characters.
@@ -160,7 +160,7 @@ public type User record {
     ExtentionAttriute onPremisesExtensionAttributes?;
 };
 
-# Custom extention attributes of the user. Source of authority for this set of properties is the on-premises Active 
+# Custom extention attributes of the user. <br/> Source of authority for this set of properties is the on-premises Active 
 # Directory which is synchronized to Azure AD
 #
 # + extensionAttribute1 - First customizable extension attribute  
@@ -196,7 +196,7 @@ public type ExtentionAttriute record {
     string? extensionAttribute15?;
 };
 
-# Represents common Azure Active Directory (Azure AD) group information.
+# Common Azure Active Directory (Azure AD) group information.
 #
 # + visibility - Specifies the group join policy and group content visibility for groups
 # + description - An optional description for the group  
@@ -228,7 +228,7 @@ public type BaseGroupData record {
     Theme? theme?;
 };
 
-# Represents a new group to be added to the Active AD.
+# New group to be added to the Active AD.
 #
 # + groupTypes - Specifies the group type and its membership  
 # + displayName - The display name for the group 
@@ -250,7 +250,7 @@ public type NewGroup record {
     string[] memberIds?;
 };
 
-# Represents updatable Azure AD group information.
+# Updatable Azure AD group information.
 #
 # + groupTypes - Specifies the group type and its membership  
 # + description - An optional description for the group  
@@ -275,7 +275,7 @@ public type UpdateGroup record {
     GroupVisibility visibility?;
 };
 
-# Represents an Azure Active Directory (Azure AD) group.
+# Azure Active Directory (Azure AD) group.
 #
 # + id - The unique identifier for the group 
 # + resourceBehaviorOptions - Specifies the group behaviors that can be set for a Microsoft 365 group during creation
@@ -333,7 +333,7 @@ public type Group record {
     boolean mailEnabled;
 };
 
-# Represents a sensitivity label assigned to an Microsoft 365 group.
+# Sensitivity label assigned to an Microsoft 365 group.
 #
 # + labelId - The unique identifier of the label  
 # + displayName - The display name of the label 
@@ -342,7 +342,7 @@ public type AssignedLabel record {
     string displayName;
 };
 
-# Represents a license assigned to a user.
+# License assigned to a user.
 #
 # + disabledPlans - A collection of the unique identifiers for plans that have been disabled  
 # + skuId - The unique identifier for the SKU  
@@ -351,7 +351,7 @@ public type AssignedLicense record {
     string skuId;
 };
 
-# Represents the permission that has been granted to a specific AzureAD app for an instance of a resource in Microsoft 
+# Permission that has been granted to a specific AzureAD app for an instance of a resource in Microsoft 
 # Graph.
 #
 # + id - The unique identifier of the resource-specific permission grant  
