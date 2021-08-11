@@ -6,7 +6,7 @@ The `azure.ad` is a [Ballerina](https://ballerina.io/) connector for Azure AD.
 ### Compatibility
 |                       | Version                   |
 |-----------------------|---------------------------|
-| Ballerina Language    | Ballerina Swan Lake Beta2 |
+| Ballerina Language    | Ballerina Swan Lake Beta3 |
 | Microsoft Graph API   | v1.0                      |
 
 
