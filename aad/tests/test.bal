@@ -515,8 +515,7 @@ function testDeleteUserAndGroup() {
 function createRandomUUIDWithoutHyphens() returns string {
     string? stringUUID = java:toString(createRandomUUID());
     if (stringUUID is string) {
-        stringUUID = 'string:substring(regex:replaceAll(stringUUID, "-", ""), 1, 4);
-        return stringUUID;
+        return 'string:substring(regex:replaceAll(stringUUID, "-", ""), 1, 4);
     } else {
         return EMPTY_STRING;
     }
