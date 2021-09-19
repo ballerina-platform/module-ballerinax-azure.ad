@@ -22,10 +22,10 @@ class UserStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    Configuration config;
+    ConnectionConfig config;
     string? queryParams;
 
-    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+    isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
         self.httpClient = httpClient;
         self.path = path;
@@ -58,11 +58,7 @@ class UserStream {
     }
     
     isolated function fetchRecordsNext() returns User[]|error {
-        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
-        http:Client nextPageClient = check new (self.nextLink, {
-            auth: self.config.clientConfig,
-            secureSocket: socketConfig
-        });
+        http:Client nextPageClient = check new (self.nextLink, self.config);
         http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToUserArray(response);
     }
@@ -84,10 +80,10 @@ class GroupStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    Configuration config;
+    ConnectionConfig config;
     string? queryParams;
 
-    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+    isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
         self.httpClient = httpClient;
         self.path = path;
@@ -120,11 +116,8 @@ class GroupStream {
     }
     
     isolated function fetchRecordsNext() returns Group[]|error {
-        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
-        http:Client nextPageClient = check new (self.nextLink, {
-            auth: self.config.clientConfig,
-            secureSocket: socketConfig
-        });        http:Response response = check nextPageClient->get(EMPTY_STRING);
+        http:Client nextPageClient = check new (self.nextLink, self.config);        
+        http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToGroupArray(response);
     }
 
@@ -145,10 +138,10 @@ class PermissionGrantStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    Configuration config;
+    ConnectionConfig config;
     string? queryParams;
 
-    isolated function init(Configuration config, http:Client httpClient, string path, string? queryParams = ()) 
+    isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
         self.httpClient = httpClient;
         self.path = path;
@@ -181,11 +174,7 @@ class PermissionGrantStream {
     }
     
     isolated function fetchRecordsNext() returns PermissionGrant[]|error {
-        http:ClientSecureSocket? socketConfig = self.config?.secureSocketConfig;
-        http:Client nextPageClient = check new (self.nextLink, {
-            auth: self.config.clientConfig,
-            secureSocket: socketConfig
-        });         
+        http:Client nextPageClient = check new (self.nextLink, self.config);         
         http:Response response = check nextPageClient->get(EMPTY_STRING);
         return check self.getAndConvertToGrantArray(response);
     }
