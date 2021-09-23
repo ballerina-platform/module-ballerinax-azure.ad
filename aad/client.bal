@@ -20,12 +20,13 @@ import ballerina/http;
 # 
 # + httpClient - the HTTP Client
 @display {
-    label: "Azure AD Client", 
-    iconPath: "MSAzureADLogo.svg"
+    label: "Azure AD", 
+    iconPath: "resources/azure.ad.svg"
 }
 public isolated client class Client {
     final http:Client httpClient;
-    final readonly & Configuration config;
+    final readonly & ConnectionConfig config;
+
     # Gets invoked to initialize the `connector`.
     # The connector initialization requires setting the API credentials. 
     # Create an [Azure account](https://azure.microsoft.com/en-us/free/) 
@@ -34,13 +35,8 @@ public isolated client class Client {
     # 
     # + aadConfig - Configurations required to initialize the `Client` endpoint
     # + return -  Error at failure of client initialization
-    public isolated function init(Configuration aadConfig) returns error? {
-        http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig clientConfig = aadConfig.clientConfig;
-        http:ClientSecureSocket? socketConfig = aadConfig?.secureSocketConfig;
-        self.httpClient = check new (BASE_URL, {
-            auth: clientConfig,
-            secureSocket: socketConfig
-        });
+    public isolated function init(ConnectionConfig aadConfig) returns error? {
+        self.httpClient = check new (BASE_URL, aadConfig);
         self.config = aadConfig.cloneReadOnly();
     }
 
