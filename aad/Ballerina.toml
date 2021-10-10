@@ -1,9 +1,9 @@
 [package]
 org= "ballerinax"
 name= "azure.ad"
-version= "1.0.1-SNAPSHOT"
+version= "2.0.0"
 authors = ["Ballerina"]
-keywords = ["it operations/security & identity tools", "cost/freemium", "vendor/microsoft"]
+keywords = ["IT Operations/Security & Identity Tools", "Cost/Freemium", "Vendor/Microsoft"]
 repository = "https://github.com/ballerina-platform/module-ballerinax-azure.ad"
 license = ["Apache-2.0"]
 
