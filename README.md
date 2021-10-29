@@ -25,11 +25,11 @@ Execute the following commands to build from the source:
  
 - To build the package:
    ```   
-   bal build -c ./aad
+   bal pack --with-tests ./aad
    ```
 - To build the package without tests:
    ```
-   bal build -c --skip-tests ./aad
+   bal pack ./aad
    ```
 ## Contributing to ballerina
  
