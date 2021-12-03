@@ -21,7 +21,7 @@ import ballerina/http;
 # + httpClient - the HTTP Client
 @display {
     label: "Azure AD", 
-    iconPath: "resources/azure.ad.svg"
+    iconPath: "icon.png"
 }
 public isolated client class Client {
     final http:Client httpClient;
