@@ -4,6 +4,7 @@ name= "azure.ad"
 version= "2.0.0"
 authors = ["Ballerina"]
 keywords = ["IT Operations/Security & Identity Tools", "Cost/Freemium", "Vendor/Microsoft"]
+icon = "icon.png"
 repository = "https://github.com/ballerina-platform/module-ballerinax-azure.ad"
 license = ["Apache-2.0"]
 
