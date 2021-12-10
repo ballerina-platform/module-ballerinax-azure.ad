@@ -96,8 +96,7 @@ public isolated client class Client {
                                        returns @display {label: "Stream of User records"} stream<User, error?>|error {
         string path = check createUrl([USERS], queryParams);
         http:Response response = check self.httpClient->get(path);
-
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -172,8 +171,7 @@ public isolated client class Client {
                                         stream<Group, error?>|error {
         string path = check createUrl([GROUPS], queryParams);   
         http:Response response = check self.httpClient->get(path);
-
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -225,7 +223,7 @@ public isolated client class Client {
         }
         
         http:Response response = check self.httpClient->get(path);
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -255,7 +253,7 @@ public isolated client class Client {
         }
         
         http:Response response = check self.httpClient->get(path);
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<Group, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -306,7 +304,7 @@ public isolated client class Client {
         string path = check createUrl([GROUPS, groupId, MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -328,7 +326,7 @@ public isolated client class Client {
         string path = check createUrl([GROUPS, groupId, TRANSITIVE_MEMBERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -379,7 +377,7 @@ public isolated client class Client {
         string path = check createUrl([GROUPS, groupId, OWNERS], queryParams);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<User, error?> finalStream = new (objectInstance);
         return finalStream; 
@@ -416,7 +414,7 @@ public isolated client class Client {
         string path = check createUrl([GROUPS, groupId, PERMISSION_GRANTS]);   
         http:Response response = check self.httpClient->get(path);
 
-        map<json>|string handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         PermissionGrantStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<PermissionGrant, error?> finalStream = new (objectInstance);
         return finalStream; 

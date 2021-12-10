@@ -49,11 +49,12 @@ class UserStream {
             self.index += 1;
             return singleRecord;
         }
+        return;
     }
 
     isolated function fetchRecordsInitial() returns User[]|error {
         http:Response response = check self.httpClient->get(self.path);
-        map<json>|string? handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         return check self.getAndConvertToUserArray(response);
     }
     
@@ -107,11 +108,12 @@ class GroupStream {
             self.index += 1;
             return singleRecord;
         }
+        return;
     }
 
     isolated function fetchRecordsInitial() returns Group[]|error {
         http:Response response = check self.httpClient->get(self.path);
-        map<json>|string? handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         return check self.getAndConvertToGroupArray(response);
     }
     
@@ -165,11 +167,12 @@ class PermissionGrantStream {
             self.index += 1;
             return singleRecord;
         }
+        return;
     }
 
     isolated function fetchRecordsInitial() returns PermissionGrant[]|error {
         http:Response response = check self.httpClient->get(self.path);
-        map<json>|string? handledResponse = check handleResponse(response);
+        _ = check handleResponse(response);
         return check self.getAndConvertToGrantArray(response);
     }
     
