@@ -135,13 +135,13 @@ function testUpdateUser() {
     enable: true,
     dependsOn: [testGetUser]
 }
-function testListUsers() {
+function testListUsers() returns error? {
     log:printInfo("client->listUsers()");
     runtime:sleep(2);
 
     stream<User,error?>|error userStream = aadClient->listUsers();
     if (userStream is stream<User,error?>) {
-        error? e = userStream.forEach(isolated function (User item) {
+        _ = check userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -154,7 +154,7 @@ function testListUsers() {
     enable: true,
     dependsOn: [testGetUser]
 }
-function testListUsersQueryParams() {
+function testListUsersQueryParams() returns error? {
     log:printInfo("client->listUsersWithParams()");
     runtime:sleep(2);
 
@@ -162,7 +162,7 @@ function testListUsersQueryParams() {
 
     stream<User,error?>|error userStream = aadClient->listUsers(params);
     if (userStream is stream<User,error?>) {
-        error? e = userStream.forEach(isolated function (User item) {
+        _ = check userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -243,7 +243,7 @@ function testUpdateGroup() {
 @test:Config {
     enable: true
 }
-function testListGroups() {
+function testListGroups() returns error? {
     log:printInfo("client->listGroups()");
     runtime:sleep(2);
 
@@ -251,7 +251,7 @@ function testListGroups() {
 
     stream<Group,error?>|error groupStream = aadClient->listGroups(query);
     if (groupStream is stream<Group,error?>) {
-        error? e = groupStream.forEach(isolated function (Group item) {
+        _ = check groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -283,7 +283,7 @@ function testRenewGroup() {
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListParentGroups() { //test this for groups and users
+function testListParentGroups() returns error? { //test this for groups and users
     log:printInfo("client->listParentGroups()");
     runtime:sleep(2);
 
@@ -291,7 +291,7 @@ function testListParentGroups() { //test this for groups and users
 
     stream<Group,error?>|error groupStream = aadClient->listParentGroups("group", groupId);
     if (groupStream is stream<Group,error?>) {
-        error? e = groupStream.forEach(isolated function (Group item) {
+        _ = check groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -304,7 +304,7 @@ function testListParentGroups() { //test this for groups and users
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListTransitiveParentGroups() { //test this for groups and users
+function testListTransitiveParentGroups() returns error? { //test this for groups and users
     log:printInfo("client->listParentGroups()");
     runtime:sleep(2);
 
@@ -312,7 +312,7 @@ function testListTransitiveParentGroups() { //test this for groups and users
 
     stream<Group,error?>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
     if (groupStream is stream<Group,error?>) {
-        error? e = groupStream.forEach(isolated function (Group item) {
+        _ = check groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -345,7 +345,7 @@ function testAddMemberToGroup() {
     enable: true,
     dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListMembers() {
+function testListMembers() returns error? {
     log:printInfo("client->listGroupMembers()");
     runtime:sleep(2);
 
@@ -353,7 +353,7 @@ function testListMembers() {
 
     stream<User,error?>|error groupStream = aadClient->listGroupMembers(groupId);
     if (groupStream is stream<User,error?>) {
-        error? e = groupStream.forEach(isolated function (User item) {
+        _ = check groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -366,7 +366,7 @@ function testListMembers() {
     enable: true,
     dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListTransitiveMembers() {
+function testListTransitiveMembers() returns error? {
     log:printInfo("client->listTransitiveGroupMembers()");
     runtime:sleep(2); 
 
@@ -374,7 +374,7 @@ function testListTransitiveMembers() {
 
     stream<User,error?>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
     if (groupStream is stream<User,error?>) {
-        error? e = groupStream.forEach(isolated function (User item) {
+        _ = check groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -427,7 +427,7 @@ function testAddOwnerToGroup() {
     enable: true,
     dependsOn: [testAddOwnerToGroup, testCreateGroup]
 }
-function testListOwners() {
+function testListOwners() returns error? {
     log:printInfo("client->listGroupOwners()");
     runtime:sleep(2);
 
@@ -435,7 +435,7 @@ function testListOwners() {
 
     stream<User,error?>|error groupStream = aadClient->listGroupOwners(groupId);
     if (groupStream is stream<User,error?>) {
-        error? e = groupStream.forEach(isolated function (User item) {
+        _ = check groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -468,7 +468,7 @@ function testRemoveOwner() {
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListPermissionGrants() {
+function testListPermissionGrants() returns error? {
     log:printInfo("client->listPermissionGrants()");
     runtime:sleep(2);
 
@@ -476,7 +476,7 @@ function testListPermissionGrants() {
 
     stream<PermissionGrant, error?>|error grantStream = aadClient->listPermissionGrants(groupId);
     if (grantStream is stream<PermissionGrant, error?>) {
-        error? e = grantStream.forEach(isolated function (PermissionGrant item) {
+        _ = check grantStream.forEach(isolated function (PermissionGrant item) {
             log:printInfo(item.toString());
         });    
     } else {
@@ -486,7 +486,7 @@ function testListPermissionGrants() {
 }
 
 @test:AfterSuite {}
-function testDeleteUserAndGroup() {
+function testDeleteUserAndGroup() returns error? {
     runtime:sleep(2);
 
     string userId = newUserId;
@@ -501,7 +501,7 @@ function testDeleteUserAndGroup() {
     }
 
     log:printInfo("client->deleteGroup()");
-    error? groupDeleteResult = aadClient->deleteGroup(groupId);
+    _ = check aadClient->deleteGroup(groupId);
     if (userDeleteResult is ()) {
         log:printInfo("Sucessfully deleted group");
     } else {
