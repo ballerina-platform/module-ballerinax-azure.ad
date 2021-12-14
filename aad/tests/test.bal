@@ -135,15 +135,18 @@ function testUpdateUser() {
     enable: true,
     dependsOn: [testGetUser]
 }
-function testListUsers() returns error? {
+function testListUsers() {
     log:printInfo("client->listUsers()");
     runtime:sleep(2);
 
     stream<User,error?>|error userStream = aadClient->listUsers();
     if (userStream is stream<User,error?>) {
-        _ = check userStream.forEach(isolated function (User item) {
+        error? e = userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
         });    
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }
     } else {
         test:assertFail(msg = userStream.message());
     }
@@ -154,7 +157,7 @@ function testListUsers() returns error? {
     enable: true,
     dependsOn: [testGetUser]
 }
-function testListUsersQueryParams() returns error? {
+function testListUsersQueryParams() {
     log:printInfo("client->listUsersWithParams()");
     runtime:sleep(2);
 
@@ -162,9 +165,12 @@ function testListUsersQueryParams() returns error? {
 
     stream<User,error?>|error userStream = aadClient->listUsers(params);
     if (userStream is stream<User,error?>) {
-        _ = check userStream.forEach(isolated function (User item) {
+        error? e = userStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
-        });    
+        });
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }    
     } else {
         test:assertFail(msg = userStream.message());
     }
@@ -243,7 +249,7 @@ function testUpdateGroup() {
 @test:Config {
     enable: true
 }
-function testListGroups() returns error? {
+function testListGroups() {
     log:printInfo("client->listGroups()");
     runtime:sleep(2);
 
@@ -251,9 +257,12 @@ function testListGroups() returns error? {
 
     stream<Group,error?>|error groupStream = aadClient->listGroups(query);
     if (groupStream is stream<Group,error?>) {
-        _ = check groupStream.forEach(isolated function (Group item) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
-        });    
+        }); 
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }   
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -283,7 +292,7 @@ function testRenewGroup() {
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListParentGroups() returns error? { //test this for groups and users
+function testListParentGroups() { //test this for groups and users
     log:printInfo("client->listParentGroups()");
     runtime:sleep(2);
 
@@ -291,9 +300,12 @@ function testListParentGroups() returns error? { //test this for groups and user
 
     stream<Group,error?>|error groupStream = aadClient->listParentGroups("group", groupId);
     if (groupStream is stream<Group,error?>) {
-        _ = check groupStream.forEach(isolated function (Group item) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
-        });    
+        }); 
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }   
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -304,7 +316,7 @@ function testListParentGroups() returns error? { //test this for groups and user
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListTransitiveParentGroups() returns error? { //test this for groups and users
+function testListTransitiveParentGroups() { //test this for groups and users
     log:printInfo("client->listParentGroups()");
     runtime:sleep(2);
 
@@ -312,9 +324,12 @@ function testListTransitiveParentGroups() returns error? { //test this for group
 
     stream<Group,error?>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
     if (groupStream is stream<Group,error?>) {
-        _ = check groupStream.forEach(isolated function (Group item) {
+        error? e = groupStream.forEach(isolated function (Group item) {
             log:printInfo(item.toString());
         });    
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -345,7 +360,7 @@ function testAddMemberToGroup() {
     enable: true,
     dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListMembers() returns error? {
+function testListMembers() {
     log:printInfo("client->listGroupMembers()");
     runtime:sleep(2);
 
@@ -353,9 +368,12 @@ function testListMembers() returns error? {
 
     stream<User,error?>|error groupStream = aadClient->listGroupMembers(groupId);
     if (groupStream is stream<User,error?>) {
-        _ = check groupStream.forEach(isolated function (User item) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
-        });    
+        });  
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }  
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -366,7 +384,7 @@ function testListMembers() returns error? {
     enable: true,
     dependsOn: [testAddMemberToGroup, testCreateGroup]
 }
-function testListTransitiveMembers() returns error? {
+function testListTransitiveMembers() {
     log:printInfo("client->listTransitiveGroupMembers()");
     runtime:sleep(2); 
 
@@ -374,9 +392,12 @@ function testListTransitiveMembers() returns error? {
 
     stream<User,error?>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
     if (groupStream is stream<User,error?>) {
-        _ = check groupStream.forEach(isolated function (User item) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
-        });    
+        });  
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }  
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -427,7 +448,7 @@ function testAddOwnerToGroup() {
     enable: true,
     dependsOn: [testAddOwnerToGroup, testCreateGroup]
 }
-function testListOwners() returns error? {
+function testListOwners() {
     log:printInfo("client->listGroupOwners()");
     runtime:sleep(2);
 
@@ -435,9 +456,12 @@ function testListOwners() returns error? {
 
     stream<User,error?>|error groupStream = aadClient->listGroupOwners(groupId);
     if (groupStream is stream<User,error?>) {
-        _ = check groupStream.forEach(isolated function (User item) {
+        error? e = groupStream.forEach(isolated function (User item) {
             log:printInfo(item.toString());
-        });    
+        });  
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }  
     } else {
         test:assertFail(msg = groupStream.message());
     }
@@ -468,7 +492,7 @@ function testRemoveOwner() {
     enable: true,
     dependsOn: [testCreateGroup]
 }
-function testListPermissionGrants() returns error? {
+function testListPermissionGrants() {
     log:printInfo("client->listPermissionGrants()");
     runtime:sleep(2);
 
@@ -476,9 +500,12 @@ function testListPermissionGrants() returns error? {
 
     stream<PermissionGrant, error?>|error grantStream = aadClient->listPermissionGrants(groupId);
     if (grantStream is stream<PermissionGrant, error?>) {
-        _ = check grantStream.forEach(isolated function (PermissionGrant item) {
+        error? e = grantStream.forEach(isolated function (PermissionGrant item) {
             log:printInfo(item.toString());
-        });    
+        }); 
+        if (e is error) {
+            log:printInfo(msg = e.message());
+        }   
     } else {
         test:assertFail(msg = grantStream.message());
     }
@@ -486,7 +513,7 @@ function testListPermissionGrants() returns error? {
 }
 
 @test:AfterSuite {}
-function testDeleteUserAndGroup() returns error? {
+function testDeleteUserAndGroup() {
     runtime:sleep(2);
 
     string userId = newUserId;
@@ -501,11 +528,11 @@ function testDeleteUserAndGroup() returns error? {
     }
 
     log:printInfo("client->deleteGroup()");
-    _ = check aadClient->deleteGroup(groupId);
-    if (userDeleteResult is ()) {
+    error? groupDeleteResult = aadClient->deleteGroup(groupId);
+    if (groupDeleteResult is ()) {
         log:printInfo("Sucessfully deleted group");
     } else {
-        test:assertFail(msg = userDeleteResult.message());
+        test:assertFail(msg = groupDeleteResult.message());
     }
 }
 

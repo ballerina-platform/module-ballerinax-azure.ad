@@ -96,6 +96,7 @@ public isolated client class Client {
                                        returns @display {label: "Stream of User records"} stream<User, error?>|error {
         string path = check createUrl([USERS], queryParams);
         http:Response response = check self.httpClient->get(path);
+
         _ = check handleResponse(response);
         UserStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<User, error?> finalStream = new (objectInstance);
@@ -171,6 +172,7 @@ public isolated client class Client {
                                         stream<Group, error?>|error {
         string path = check createUrl([GROUPS], queryParams);   
         http:Response response = check self.httpClient->get(path);
+
         _ = check handleResponse(response);
         GroupStream objectInstance = check new (self.config, self.httpClient, path, queryParams);
         stream<Group, error?> finalStream = new (objectInstance);
