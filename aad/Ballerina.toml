@@ -1,8 +1,8 @@
 [package]
-distribution = "slbeta6"
+distribution = "2201.0.0"
 org= "ballerinax"
 name= "azure.ad"
-version= "2.1.0"
+version= "2.2.0"
 authors = ["Ballerina"]
 keywords = ["IT Operations/Security & Identity Tools", "Cost/Freemium", "Vendor/Microsoft"]
 icon = "icon.png"
