@@ -24,7 +24,6 @@ jobs:
                   args:
                       pack ./aad
               env:
-                JAVA_HOME: /usr/lib/jvm/default-jvm
                 REFRESH_URL: ${{ secrets.REFRESH_URL }}
                 REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
                 CLIENT_ID: ${{ secrets.CLIENT_ID }}
