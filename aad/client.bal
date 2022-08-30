@@ -36,7 +36,24 @@ public isolated client class Client {
     # + aadConfig - Configurations required to initialize the `Client` endpoint
     # + return -  Error at failure of client initialization
     public isolated function init(ConnectionConfig aadConfig) returns error? {
-        self.httpClient = check new (BASE_URL, aadConfig);
+        http:ClientConfiguration httpClientConfig = {
+            auth: aadConfig.auth,
+            httpVersion: aadConfig.httpVersion,
+            http1Settings: {...aadConfig.http1Settings},
+            http2Settings: aadConfig.http2Settings,
+            timeout: aadConfig.timeout,
+            forwarded: aadConfig.forwarded,
+            poolConfig: aadConfig.poolConfig,
+            cache: aadConfig.cache,
+            compression: aadConfig.compression,
+            circuitBreaker: aadConfig.circuitBreaker,
+            retryConfig: aadConfig.retryConfig,
+            responseLimits: aadConfig.responseLimits,
+            secureSocket: aadConfig.secureSocket,
+            proxy: aadConfig.proxy,
+            validation: aadConfig.validation
+        };
+        self.httpClient = check new (BASE_URL, httpClientConfig);
         self.config = aadConfig.cloneReadOnly();
     }
 

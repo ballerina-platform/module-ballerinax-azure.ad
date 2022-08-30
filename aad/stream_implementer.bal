@@ -22,15 +22,31 @@ class UserStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    ConnectionConfig config;
+    http:ClientConfiguration config;
     string? queryParams;
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
+        self.config = {
+            auth: config.auth,
+            httpVersion: config.httpVersion,
+            http1Settings: {...config.http1Settings},
+            http2Settings: config.http2Settings,
+            timeout: config.timeout,
+            forwarded: config.forwarded,
+            poolConfig: config.poolConfig,
+            cache: config.cache,
+            compression: config.compression,
+            circuitBreaker: config.circuitBreaker,
+            retryConfig: config.retryConfig,
+            responseLimits: config.responseLimits,
+            secureSocket: config.secureSocket,
+            proxy: config.proxy,
+            validation: config.validation
+        };
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
-        self.config = config;
         self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
@@ -81,15 +97,31 @@ class GroupStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    ConnectionConfig config;
+    http:ClientConfiguration config;
     string? queryParams;
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
+        self.config = {
+            auth: config.auth,
+            httpVersion: config.httpVersion,
+            http1Settings: {...config.http1Settings},
+            http2Settings: config.http2Settings,
+            timeout: config.timeout,
+            forwarded: config.forwarded,
+            poolConfig: config.poolConfig,
+            cache: config.cache,
+            compression: config.compression,
+            circuitBreaker: config.circuitBreaker,
+            retryConfig: config.retryConfig,
+            responseLimits: config.responseLimits,
+            secureSocket: config.secureSocket,
+            proxy: config.proxy,
+            validation: config.validation
+        };
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
-        self.config = config;
         self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
@@ -140,15 +172,31 @@ class PermissionGrantStream {
     int index = 0;
     private final http:Client httpClient;
     private final string path;
-    ConnectionConfig config;
+    http:ClientConfiguration config;
     string? queryParams;
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
+        self.config = {
+            auth: config.auth,
+            httpVersion: config.httpVersion,
+            http1Settings: {...config.http1Settings},
+            http2Settings: config.http2Settings,
+            timeout: config.timeout,
+            forwarded: config.forwarded,
+            poolConfig: config.poolConfig,
+            cache: config.cache,
+            compression: config.compression,
+            circuitBreaker: config.circuitBreaker,
+            retryConfig: config.retryConfig,
+            responseLimits: config.responseLimits,
+            secureSocket: config.secureSocket,
+            proxy: config.proxy,
+            validation: config.validation
+        };
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
-        self.config = config;
         self.queryParams = queryParams;
         self.currentEntries = check self.fetchRecordsInitial();
     }
