@@ -37,7 +37,7 @@ public isolated client class Client {
     # + return -  Error at failure of client initialization
     public isolated function init(ConnectionConfig aadConfig) returns error? {
         http:ClientConfiguration httpClientConfig = {
-            auth: aadConfig.auth,
+            auth: let var authConfig = aadConfig.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
             httpVersion: aadConfig.httpVersion,
             http1Settings: {...aadConfig.http1Settings},
             http2Settings: aadConfig.http2Settings,
