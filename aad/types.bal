@@ -14,6 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/http;
+import ballerinax/'client.config;
+
+# Client configuration details.
+@display {label: "Connection Config"}
+public type ConnectionConfig record {|
+    *config:ConnectionConfig;
+    # Configurations related to client authentication
+    http:BearerTokenConfig|config:OAuth2RefreshTokenGrantConfig auth;
+|};
+
 # Common Azure AD user account information. 
 #
 # + onPremisesImmutableId - This property is used to associate an on-premise active directory user account to its Azure 
