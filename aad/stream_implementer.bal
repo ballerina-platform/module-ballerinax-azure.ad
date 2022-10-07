@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerinax/'client.config;
 
 class UserStream {
     private User[] currentEntries = [];
@@ -27,23 +28,7 @@ class UserStream {
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
-        self.config = {
-            auth: let var authConfig = config.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
-            httpVersion: config.httpVersion,
-            http1Settings: {...config.http1Settings},
-            http2Settings: config.http2Settings,
-            timeout: config.timeout,
-            forwarded: config.forwarded,
-            poolConfig: config.poolConfig,
-            cache: config.cache,
-            compression: config.compression,
-            circuitBreaker: config.circuitBreaker,
-            retryConfig: config.retryConfig,
-            responseLimits: config.responseLimits,
-            secureSocket: config.secureSocket,
-            proxy: config.proxy,
-            validation: config.validation
-        };
+        self.config = check config:constructHTTPClientConfig(config);
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
@@ -102,23 +87,7 @@ class GroupStream {
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
-        self.config = {
-            auth: let var authConfig = config.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
-            httpVersion: config.httpVersion,
-            http1Settings: {...config.http1Settings},
-            http2Settings: config.http2Settings,
-            timeout: config.timeout,
-            forwarded: config.forwarded,
-            poolConfig: config.poolConfig,
-            cache: config.cache,
-            compression: config.compression,
-            circuitBreaker: config.circuitBreaker,
-            retryConfig: config.retryConfig,
-            responseLimits: config.responseLimits,
-            secureSocket: config.secureSocket,
-            proxy: config.proxy,
-            validation: config.validation
-        };
+        self.config = check config:constructHTTPClientConfig(config);
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;
@@ -177,23 +146,7 @@ class PermissionGrantStream {
 
     isolated function init(ConnectionConfig config, http:Client httpClient, string path, string? queryParams = ()) 
                            returns error? {
-        self.config = {
-            auth: let var authConfig = config.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
-            httpVersion: config.httpVersion,
-            http1Settings: {...config.http1Settings},
-            http2Settings: config.http2Settings,
-            timeout: config.timeout,
-            forwarded: config.forwarded,
-            poolConfig: config.poolConfig,
-            cache: config.cache,
-            compression: config.compression,
-            circuitBreaker: config.circuitBreaker,
-            retryConfig: config.retryConfig,
-            responseLimits: config.responseLimits,
-            secureSocket: config.secureSocket,
-            proxy: config.proxy,
-            validation: config.validation
-        };
+        self.config = check config:constructHTTPClientConfig(config);
         self.httpClient = httpClient;
         self.path = path;
         self.nextLink = EMPTY_STRING;

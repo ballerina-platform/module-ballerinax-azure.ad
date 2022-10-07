@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerinax/'client.config;
 
 # This is connecting to the Microsoft Graph RESTful web API that enables you to access Microsoft Cloud service resources.
 # 
@@ -33,28 +34,12 @@ public isolated client class Client {
     # and obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis). Configure the Access token to 
     # have the [required permission](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis#add-a-scope).
     # 
-    # + aadConfig - Configurations required to initialize the `Client` endpoint
+    # + config - Configurations required to initialize the `Client` endpoint
     # + return -  Error at failure of client initialization
-    public isolated function init(ConnectionConfig aadConfig) returns error? {
-        http:ClientConfiguration httpClientConfig = {
-            auth: let var authConfig = aadConfig.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
-            httpVersion: aadConfig.httpVersion,
-            http1Settings: {...aadConfig.http1Settings},
-            http2Settings: aadConfig.http2Settings,
-            timeout: aadConfig.timeout,
-            forwarded: aadConfig.forwarded,
-            poolConfig: aadConfig.poolConfig,
-            cache: aadConfig.cache,
-            compression: aadConfig.compression,
-            circuitBreaker: aadConfig.circuitBreaker,
-            retryConfig: aadConfig.retryConfig,
-            responseLimits: aadConfig.responseLimits,
-            secureSocket: aadConfig.secureSocket,
-            proxy: aadConfig.proxy,
-            validation: aadConfig.validation
-        };
+    public isolated function init(ConnectionConfig config) returns error? {
+        http:ClientConfiguration httpClientConfig = check config:constructHTTPClientConfig(config);
         self.httpClient = check new (BASE_URL, httpClientConfig);
-        self.config = aadConfig.cloneReadOnly();
+        self.config = config.cloneReadOnly();
     }
 
     // ************************************* Operations on a User resource *********************************************
