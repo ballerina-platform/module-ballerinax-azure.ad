@@ -3,6 +3,7 @@ Ballerina Azure Active Directory Connector
 
 [![Build Status](https://github.com/ballerina-platform/module-ballerinax-azure.ad/workflows/CI/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-msgraph-teams/actions?query=workflow%3ACI)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerinax-azure.ad.svg)](https://github.com/ballerina-platform/module-ballerinax-msgraph-teams/commits/master)
+[![GraalVM Check](https://github.com/ballerina-platform/module-ballerinax-azure.ad/actions/workflows/build-with-bal-test-native.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure.ad/actions/workflows/build-with-bal-test-native.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Azure Active Directory(AD) is Microsoft’s multi-tenant, cloud-based directory and identity management service. It provides capabilities to enable Single Sign-On (SSO), multi-factor authentication, self-service password reset, privileged identity management, role-based access control, etc., to first and third-party Software as a Service (SaaS) applications.
