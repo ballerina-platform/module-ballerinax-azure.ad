@@ -26,27 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Create group");
-    ad:NewGroup info = {
-        description: "<DESCRIPTION>",
-        displayName: "<DISPLAY_NAME>",
-        groupTypes:["Unified"],
-        mailEnabled: true,
-        mailNickname: "<MAIL_NICKNAME>",
-        securityEnabled: false
-    };
+    log:printInfo("Remove owner from group");
+    string groupId = "<GROUP_ID>";
+    string ownerId = "<USER_ID>";
 
-    ad:Group|error groupInfo = aadClient->createGroup(info);
-    if (groupInfo is ad:Group) {
-        log:printInfo("Group created successfully " + groupInfo?.id.toString());
+    error? result = aadClient->removeGroupOwner(groupId, ownerId);
+    if (result is ()) {
+        log:printInfo("Sucessfully removed");
     } else {
-        log:printError(groupInfo.message());
+        log:printError(result.message());
     }
 }

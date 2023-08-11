@@ -26,19 +26,19 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
     log:printInfo("Update group");
     string groupId = "<GROUP_ID>";
     ad:UpdateGroup info = {
         mailNickname: "<MAIL_NICKNAME>"
     };
-    
+
     error? result = aadClient->updateGroup(groupId, info);
     if (result is ()) {
         log:printInfo("Sucessfully updated");

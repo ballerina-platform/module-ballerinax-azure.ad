@@ -26,20 +26,22 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Get group");
+    log:printInfo("List members in a group");
     string groupId = "<GROUP_ID>";
 
-    ad:Group|error groupInfo = aadClient->getGroup(groupId);
-    if (groupInfo is ad:Group) {
-        log:printInfo("Group " + groupInfo.toString());
+    stream<ad:User, error>|error groupStream = aadClient->listGroupMembers(groupId);
+    if (groupStream is stream<ad:User, error>) {
+        error? e = groupStream.forEach(isolated function(ad:User item) {
+            log:printInfo(item.toString());
+        });
     } else {
-        log:printError(groupInfo.message());
+        log:printError(groupStream.message());
     }
 }

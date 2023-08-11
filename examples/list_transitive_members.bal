@@ -26,30 +26,22 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Create user");
-    ad:NewUser info = {
-        accountEnabled: true,
-        displayName: "<DISPLAY_NAME>",
-        userPrincipalName: "<USER_PRINCIPAL_NAME>",
-        mailNickname: "<MAIL_NICKNAME>",
-        passwordProfile: {
-            password: "<PASSWORD>",
-            forceChangePasswordNextSignIn: true
-        },
-        surname: "<SURNAME>"
-    };
+    log:printInfo("List transitive members in a group");
+    string groupId = "<GROUP_ID>";
 
-    ad:User|error userInfo = aadClient->createUser(info);
-    if (userInfo is ad:User) {
-        log:printInfo("User succesfully created " + userInfo?.id.toString());
+    stream<ad:User, error>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
+    if (groupStream is stream<ad:User, error>) {
+        error? e = groupStream.forEach(isolated function(ad:User item) {
+            log:printInfo(item.toString());
+        });
     } else {
-        log:printError(userInfo.message());
+        log:printError(groupStream.message());
     }
 }

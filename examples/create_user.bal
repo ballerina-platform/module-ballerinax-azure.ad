@@ -26,20 +26,30 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Renew group");
-    string groupId = "<GROUP_ID>";
+    log:printInfo("Create user");
+    ad:NewUser info = {
+        accountEnabled: true,
+        displayName: "<DISPLAY_NAME>",
+        userPrincipalName: "<USER_PRINCIPAL_NAME>",
+        mailNickname: "<MAIL_NICKNAME>",
+        passwordProfile: {
+            password: "<PASSWORD>",
+            forceChangePasswordNextSignIn: true
+        },
+        surname: "<SURNAME>"
+    };
 
-    error? result = aadClient->renewGroup(groupId);
-    if (result is ()) {
-        log:printInfo("Sucessfully renewed");
+    ad:User|error userInfo = aadClient->createUser(info);
+    if (userInfo is ad:User) {
+        log:printInfo("User succesfully created " + userInfo?.id.toString());
     } else {
-        log:printError(result.message());
+        log:printError(userInfo.message());
     }
 }

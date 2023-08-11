@@ -26,22 +26,27 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("List permission grants");
-    string groupId = "<GROUP_ID>";
+    log:printInfo("Create group");
+    ad:NewGroup info = {
+        description: "<DESCRIPTION>",
+        displayName: "<DISPLAY_NAME>",
+        groupTypes: ["Unified"],
+        mailEnabled: true,
+        mailNickname: "<MAIL_NICKNAME>",
+        securityEnabled: false
+    };
 
-    stream<ad:PermissionGrant,error>|error grantStream = aadClient->listPermissionGrants(groupId);
-    if (grantStream is stream<ad:PermissionGrant,error>) {
-        error? e = grantStream.forEach(isolated function (ad:PermissionGrant item) {
-            log:printInfo(item.toString());
-        });    
+    ad:Group|error groupInfo = aadClient->createGroup(info);
+    if (groupInfo is ad:Group) {
+        log:printInfo("Group created successfully " + groupInfo?.id.toString());
     } else {
-        log:printError(grantStream.message());
+        log:printError(groupInfo.message());
     }
 }
