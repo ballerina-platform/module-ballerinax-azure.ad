@@ -36,8 +36,8 @@ public function main() returns error? {
     log:printInfo("List permission grants");
     string groupId = "<GROUP_ID>";
 
-    stream<ad:PermissionGrant, error>|error grantStream = aadClient->listPermissionGrants(groupId);
-    if (grantStream is stream<ad:PermissionGrant, error>) {
+    stream<ad:PermissionGrant, error?>|error grantStream = aadClient->listPermissionGrants(groupId);
+    if (grantStream is stream<ad:PermissionGrant, error?>) {
         error? e = grantStream.forEach(isolated function(ad:PermissionGrant item) {
             log:printInfo(item.toString());
         });

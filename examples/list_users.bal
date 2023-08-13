@@ -35,8 +35,8 @@ public function main() returns error? {
 
     log:printInfo("List users");
 
-    stream<ad:User, error>|error userStream = aadClient->listUsers();
-    if (userStream is stream<ad:User, error>) {
+    stream<ad:User, error?>|error userStream = aadClient->listUsers();
+    if (userStream is stream<ad:User, error?>) {
         error? e = userStream.forEach(isolated function(ad:User item) {
             log:printInfo(item.toString());
         });

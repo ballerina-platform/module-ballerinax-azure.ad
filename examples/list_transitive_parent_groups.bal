@@ -36,8 +36,8 @@ public function main() returns error? {
     log:printInfo("List transitive parent groups");
     string groupId = "<GROUP_ID>";
 
-    stream<ad:Group, error>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
-    if (groupStream is stream<ad:Group, error>) {
+    stream<ad:Group, error?>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
+    if (groupStream is stream<ad:Group, error?>) {
         error? e = groupStream.forEach(isolated function(ad:Group item) {
             log:printInfo(item.toString());
         });

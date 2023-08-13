@@ -35,8 +35,8 @@ public function main() returns error? {
 
     log:printInfo("List groups");
 
-    stream<ad:Group, error>|error groupStream = aadClient->listGroups();
-    if (groupStream is stream<ad:Group, error>) {
+    stream<ad:Group, error?>|error groupStream = aadClient->listGroups();
+    if (groupStream is stream<ad:Group, error?>) {
         error? e = groupStream.forEach(isolated function(ad:Group item) {
             log:printInfo(item.toString());
         });
