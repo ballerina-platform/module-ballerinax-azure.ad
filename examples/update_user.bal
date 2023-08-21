@@ -26,21 +26,23 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Add owner to the group");
-    string groupId = "<GROUP_ID>";
-    string ownerId = "<USER_ID>";
-
-    error? result = aadClient->addGroupOwner(groupId, ownerId);
-    if (result is ()) {
-        log:printInfo("Sucessfully added group owner");
+    log:printInfo("Update user");
+    string userId = "<USER_ID>";
+    ad:UpdateUser info = {
+        displayName: "<UPDATED_DISPLAY_NAME>",
+        department: "<DEPARTMENT>"
+    };
+    error? userInfo = aadClient->updateUser(userId, info);
+    if (userInfo is ()) {
+        log:printInfo("Sucessfully updated");
     } else {
-        log:printError(result.message());
+        log:printError(userInfo.message());
     }
 }

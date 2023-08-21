@@ -26,20 +26,20 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Remove owner from group");
+    log:printInfo("Add members to the group");
     string groupId = "<GROUP_ID>";
-    string ownerId = "<USER_ID>";
+    string memberId = "<USER_ID>";
 
-    error? result = aadClient->removeGroupOwner(groupId, ownerId);
+    error? result = aadClient->addGroupMember(groupId, memberId);
     if (result is ()) {
-        log:printInfo("Sucessfully removed");
+        log:printInfo("Sucessfully added group member");
     } else {
         log:printError(result.message());
     }

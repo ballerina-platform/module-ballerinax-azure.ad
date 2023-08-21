@@ -26,22 +26,20 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Update user");
+    log:printInfo("Get user");
     string userId = "<USER_ID>";
-    ad:UpdateUser info = {
-        displayName: "<UPDATED_DISPLAY_NAME>",
-        department: "<DEPARTMENT>"
-    };
-    error? userInfo = aadClient->updateUser(userId, info);
-    if (userInfo is ()) {
-        log:printInfo("Sucessfully updated");
+
+    ad:User|error userInfo = aadClient->getUser(userId);
+
+    if (userInfo is ad:User) {
+        log:printInfo("User" + userInfo.toString());
     } else {
         log:printError(userInfo.message());
     }

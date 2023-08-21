@@ -27,11 +27,11 @@ Execute the following commands to build from the source:
  
 - To build the package:
    ```   
-   bal pack ./aad
+   bal build ./ballerina
    ```
 - To run tests after build:
    ```
-   bal test ./aad
+   bal test ./ballerina
    ```
 ## Contributing to ballerina
  

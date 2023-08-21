@@ -26,20 +26,20 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Renew group");
+    log:printInfo("Get group");
     string groupId = "<GROUP_ID>";
 
-    error? result = aadClient->renewGroup(groupId);
-    if (result is ()) {
-        log:printInfo("Sucessfully renewed");
+    ad:Group|error groupInfo = aadClient->getGroup(groupId);
+    if (groupInfo is ad:Group) {
+        log:printInfo("Group " + groupInfo.toString());
     } else {
-        log:printError(result.message());
+        log:printError(groupInfo.message());
     }
 }

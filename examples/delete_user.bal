@@ -26,21 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
+
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Get user");
+    log:printInfo("Delete user");
     string userId = "<USER_ID>";
-    
-    ad:User|error userInfo = aadClient->getUser(userId);
 
-    if (userInfo is ad:User) {
-        log:printInfo("User" + userInfo.toString());
+    error? result = aadClient->deleteUser(userId);
+    if (result is ()) {
+        log:printInfo("Sucessfully deleted");
     } else {
-        log:printError(userInfo.message());
+        log:printError(result.message());
     }
 }

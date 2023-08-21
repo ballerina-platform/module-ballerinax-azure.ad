@@ -26,21 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Remove member from group");
-    string groupId = "<GROUP_ID>";
-    string memberId = "<USER_ID>";
+    log:printInfo("List users");
 
-    error? result = aadClient->removeGroupMember(groupId, memberId);
-    if (result is ()) {
-        log:printInfo("Sucessfully removed");
+    stream<ad:User, error?>|error userStream = aadClient->listUsers();
+    if (userStream is stream<ad:User, error?>) {
+        error? e = userStream.forEach(isolated function(ad:User item) {
+            log:printInfo(item.toString());
+        });
     } else {
-        log:printError(result.message());
+        log:printError(userStream.message());
     }
 }

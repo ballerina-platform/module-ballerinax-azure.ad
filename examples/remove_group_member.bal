@@ -26,30 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Create user");
-    ad:NewUser info = {
-        accountEnabled: true,
-        displayName: "<DISPLAY_NAME>",
-        userPrincipalName: "<USER_PRINCIPAL_NAME>",
-        mailNickname: "<MAIL_NICKNAME>",
-        passwordProfile: {
-            password: "<PASSWORD>",
-            forceChangePasswordNextSignIn: true
-        },
-        surname: "<SURNAME>"
-    };
+    log:printInfo("Remove member from group");
+    string groupId = "<GROUP_ID>";
+    string memberId = "<USER_ID>";
 
-    ad:User|error userInfo = aadClient->createUser(info);
-    if (userInfo is ad:User) {
-        log:printInfo("User succesfully created " + userInfo?.id.toString());
+    error? result = aadClient->removeGroupMember(groupId, memberId);
+    if (result is ()) {
+        log:printInfo("Sucessfully removed");
     } else {
-        log:printError(userInfo.message());
+        log:printError(result.message());
     }
 }

@@ -26,21 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
     log:printInfo("List transitive members in a group");
     string groupId = "<GROUP_ID>";
 
-    stream<ad:User,error>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
-    if (groupStream is stream<ad:User,error>) {
-        error? e = groupStream.forEach(isolated function (ad:User item) {
+    stream<ad:User, error?>|error groupStream = aadClient->listTransitiveGroupMembers(groupId);
+    if (groupStream is stream<ad:User, error?>) {
+        error? e = groupStream.forEach(isolated function(ad:User item) {
             log:printInfo(item.toString());
-        });    
+        });
     } else {
         log:printError(groupStream.message());
     }

@@ -26,22 +26,21 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
+
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("List transitive parent groups");
+    log:printInfo("Delete group");
     string groupId = "<GROUP_ID>";
 
-    stream<ad:Group,error>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
-    if (groupStream is stream<ad:Group,error>) {
-        error? e = groupStream.forEach(isolated function (ad:Group item) {
-            log:printInfo(item.toString());
-        });    
+    error? result = aadClient->deleteGroup(groupId);
+    if (result is ()) {
+        log:printInfo("Sucessfully deleted");
     } else {
-        log:printError(groupStream.message());
+        log:printError(result.message());
     }
 }

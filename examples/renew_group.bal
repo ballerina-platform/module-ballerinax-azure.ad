@@ -26,20 +26,19 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
-            
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Delete user");
-    string userId = "<USER_ID>";
+    log:printInfo("Renew group");
+    string groupId = "<GROUP_ID>";
 
-    error? result = aadClient->deleteUser(userId);    
+    error? result = aadClient->renewGroup(groupId);
     if (result is ()) {
-        log:printInfo("Sucessfully deleted");
+        log:printInfo("Sucessfully renewed");
     } else {
         log:printError(result.message());
     }

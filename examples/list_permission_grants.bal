@@ -26,21 +26,22 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("Add members to the group");
+    log:printInfo("List permission grants");
     string groupId = "<GROUP_ID>";
-    string memberId = "<USER_ID>";
 
-    error? result = aadClient->addGroupMember(groupId, memberId);
-    if (result is ()) {
-        log:printInfo("Sucessfully added group member");
+    stream<ad:PermissionGrant, error?>|error grantStream = aadClient->listPermissionGrants(groupId);
+    if (grantStream is stream<ad:PermissionGrant, error?>) {
+        error? e = grantStream.forEach(isolated function(ad:PermissionGrant item) {
+            log:printInfo(item.toString());
+        });
     } else {
-        log:printError(result.message());
+        log:printError(grantStream.message());
     }
 }

@@ -67,4 +67,4 @@ if (userInfo is ad:User) {
 ```
 2. Use `bal run` command to compile and run the Ballerina program.
 
-**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure.ad/tree/master/aad/samples)**
+**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure.ad/tree/master/examples)**

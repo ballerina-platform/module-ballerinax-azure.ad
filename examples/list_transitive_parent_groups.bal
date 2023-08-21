@@ -26,22 +26,22 @@ public function main() returns error? {
     ad:ConnectionConfig configuration = {
         auth: {
             refreshUrl: refreshUrl,
-            refreshToken : refreshToken,
-            clientId : clientId,
-            clientSecret : clientSecret
+            refreshToken: refreshToken,
+            clientId: clientId,
+            clientSecret: clientSecret
         }
     };
-    ad:Client aadClient = check new(configuration);
+    ad:Client aadClient = check new (configuration);
 
-    log:printInfo("List permission grants");
+    log:printInfo("List transitive parent groups");
     string groupId = "<GROUP_ID>";
 
-    stream<ad:PermissionGrant,error>|error grantStream = aadClient->listPermissionGrants(groupId);
-    if (grantStream is stream<ad:PermissionGrant,error>) {
-        error? e = grantStream.forEach(isolated function (ad:PermissionGrant item) {
+    stream<ad:Group, error?>|error groupStream = aadClient->listTransitiveParentGroups("group", groupId);
+    if (groupStream is stream<ad:Group, error?>) {
+        error? e = groupStream.forEach(isolated function(ad:Group item) {
             log:printInfo(item.toString());
-        });    
+        });
     } else {
-        log:printError(grantStream.message());
+        log:printError(groupStream.message());
     }
 }
