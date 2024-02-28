@@ -19,8 +19,8 @@ import ballerina/jballerina.java;
 import ballerina/lang.runtime;
 import ballerina/log;
 import ballerina/os;
-import ballerina/regex;
 import ballerina/test;
+import ballerina/lang.regexp;
 
 configurable string & readonly refreshUrl = os:getEnv("REFRESH_URL");
 configurable string & readonly refreshToken = os:getEnv("REFRESH_TOKEN");
@@ -541,8 +541,8 @@ function testDeleteUserAndGroup() {
 # + return - A string UUID without hyphens
 function createRandomUUIDWithoutHyphens() returns string {
     string? stringUUID = java:toString(createRandomUUID());
-    if (stringUUID is string) {
-        return 'string:substring(regex:replaceAll(stringUUID, "-", ""), 1, 4);
+    if stringUUID is string {
+        return 'string:substring(regexp:replaceAll(re`-`, stringUUID, ""), 1, 4);
     } else {
         return EMPTY_STRING;
     }
