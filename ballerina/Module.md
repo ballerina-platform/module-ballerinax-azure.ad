@@ -1,11 +1,19 @@
 ## Overview
-Ballerina connector for Azure Active Directory (AD) is connecting the Azure AD REST API in Microsoft Graph v1.0 via Ballerina language. 
+The connector for Azure Active Directory (AD) is connecting the Azure AD REST API in Microsoft Graph v1.0 via Ballerina language. 
 It provides capability to perform management operations on user and group resources in an Azure AD tenent 
 (Organization).
 
 The connector uses the Microsoft Graph REST web API that provides the capability to access Microsoft Cloud service resources. This version of the connector only supports the operations on users and groups in an Azure AD.
  
 This module supports [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview) `v1.0`. 
+
+
+### Key Features
+
+- Manage users, groups, and directory roles in Azure AD
+- Access organizational directory data via Microsoft Graph
+- Handle application registrations and service principals
+- Support for authentication and authorization management
 
 ## Prerequisites
 Before using this connector in your Ballerina application, complete the following:
