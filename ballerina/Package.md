@@ -1,14 +1,15 @@
-Connects to Azure AD from Ballerina
+## Overview
 
-## Package overview
-The `azure.ad` is a [Ballerina](https://ballerina.io/) connector for Azure AD.
+[Azure Active Directory (Azure AD)](https://azure.microsoft.com/en-us/products/active-directory/), now part of Microsoft Entra, is a cloud-based identity and access management service. it helps your employees sign in and access resources in external resources, such as Microsoft 365, the Azure portal, and thousands of other SaaS applications.
 
-### Compatibility
-|                       | Version                      |
-|-----------------------|------------------------------|
-| Ballerina Language    | Ballerina Swan Lake 2201.3.0 |
-| Microsoft Graph API   | v1.0                         |
+The Azure AD connector offers APIs to connect and interact with Microsoft Graph API endpoints, enabling seamless identity and access management.
 
+### Key Features
+
+- Efficient identity and access management
+- Support for Microsoft Graph API v1.0
+- Manage users, groups, and applications programmatically
+- Secure integration with Azure and other SaaS applications
 
 ## Report issues
 To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina Extended Library repository](https://github.com/ballerina-platform/ballerina-extended-library)
